@@ -27,7 +27,7 @@ public:
     Game *game;
 
     Snake(Game *);
-    void init();
+    void init(int a);
     void move(sf::Keyboard::Key);
     void update();
     void printbody();

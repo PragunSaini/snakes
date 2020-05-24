@@ -16,11 +16,13 @@ Snakebody::Snakebody(Game *game, unsigned int _x, unsigned int _y, sf::Color col
 
 Snake::Snake(Game *game) : game(game) {}
 
-void Snake::init() {
+void Snake::init(int a) {
     // Initialize a snake with one body part
     length = 1;
-    Snakebody head(game, 0, 0);
-    snake.push_back(head);
+
+    snake.push_back(Snakebody(game, a, 0));
+    // snake.push_back(Snakebody(game, 0, 1));
+    // snake.push_back(Snakebody(game, 0, 0));
     dir = Direction::DOWN;
 }
 
@@ -68,30 +70,31 @@ void Snake::move(sf::Keyboard::Key key) {
     switch (key) {
     case sf::Keyboard::Up:
         if (dir != Direction::DOWN) {
-            // snake[0].y--;
             dir = Direction::UP;
         }
         break;
 
     case sf::Keyboard::Down:
         if (dir != Direction::UP) {
-            // snake[0].y++;
             dir = Direction::DOWN;
         }
         break;
 
     case sf::Keyboard::Left:
         if (dir != Direction::RIGHT) {
-            // snake[0].x--;
             dir = Direction::LEFT;
         }
         break;
 
     case sf::Keyboard::Right:
         if (dir != Direction::LEFT) {
-            // snake[0].x++;
             dir = Direction::RIGHT;
         }
+        break;
+
+    case sf::Keyboard::Enter:
+        snake.push_back(Snakebody(game, -1, -1));
+        length++;
         break;
 
     default:

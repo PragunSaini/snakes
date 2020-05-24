@@ -13,6 +13,7 @@ class Snakebody {
 public:
     int x;
     int y;
+    bool newblock;
 
     Snakebody(int, int, sf::Color);
 };
@@ -22,13 +23,13 @@ public:
     unsigned int length;
     std::vector<Snakebody> snake;
     Game *game;
+    Direction dir;
 
     Snake(Game *);
-    void init(int a);
+    void init(int, int);
     void move(sf::Keyboard::Key);
     void update();
     void printbody();
-    Direction dir;
 };
 
 #endif

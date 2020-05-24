@@ -15,9 +15,9 @@ Game::Game() :
     }
 
     // Initialize snake
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 100; i++) {
         snake.push_back(Snake(this));
-        snake[i].init(i);
+        snake[i].init(rand.getX(), rand.getY());
     }
 
     map.updateMap();

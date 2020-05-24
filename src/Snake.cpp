@@ -3,25 +3,24 @@
 
 // Initialize a snake body part at given coords
 Snakebody::Snakebody(int x, int y, sf::Color col = sf::Color::Yellow) :
-    x(x), y(y) {}
+    x(x), y(y), newblock(true) {}
 
 Snake::Snake(Game *game) :
     game(game) {}
 
-void Snake::init(int a) {
+void Snake::init(int x, int y) {
     // Initialize a snake with one body part
     length = 1;
 
-    snake.push_back(Snakebody(a, 0));
-    game->grid[0][a] = 1;
+    snake.push_back(Snakebody(x, y));
+    snake[0].newblock = false;
+    game->grid[y][x] = 1;
     dir = Direction::DOWN;
 }
 
 void Snake::update() {
-    if (snake[length - 1].x >= 0) {
+    if (!snake[length - 1].newblock)
         game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
-        // game->map.changeColor(snake[length - 1].x, snake[length - 1].y);
-    }
 
     for (int i = length - 1; i >= 1; i--) {
         snake[i] = snake[i - 1];
@@ -81,7 +80,7 @@ void Snake::move(sf::Keyboard::Key key) {
         break;
 
     case sf::Keyboard::Enter:
-        snake.push_back(Snakebody(-1, -1));
+        snake.push_back(Snakebody(0, 0));
         length++;
         break;
 

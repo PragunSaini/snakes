@@ -42,7 +42,6 @@ void Map::changeColor(int x, int y) {
 void Map::updateMap() {
     int width = Config::COLS;
     int height = Config::ROWS;
-    int tilesize = game->tilesize;
 
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {

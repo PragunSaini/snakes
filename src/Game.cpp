@@ -17,11 +17,10 @@ Game::Game() :
     // Initialize snake
     for (int i = 0; i < 1; i++) {
         snake.push_back(Snake(this));
-        snake[i].init(2 * i);
+        snake[i].init(i);
     }
 
-    grid[0][0] = 1;
-    map.changeColor(0, 0);
+    map.updateMap();
 
     snakeSpeed = sf::seconds(1.0 / 30.0);
 }
@@ -41,7 +40,7 @@ void Game::draw() {
     else {
         frametime.restart();
     }
-
+    map.updateMap();
     window.clear(sf::Color::Black);
     window.draw(map);
     window.display();

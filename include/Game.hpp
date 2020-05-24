@@ -13,9 +13,8 @@
 class Game {
 public:
     sf::RenderWindow window;
-    // unsigned int grid[Config::ROWS][Config::COLS];
     std::vector<std::vector<int>> grid;
-    unsigned int tilesize;
+    int tilesize;
     Map map;
     sf::Clock frametime;
     sf::Time snakeSpeed;

@@ -1,68 +1,56 @@
 #include "Snake.hpp"
 #include "Game.hpp"
 
-Snakebody::Snakebody(Game *game) : Snakebody(game, 0, 0, sf::Color::Yellow) {}
-
 // Initialize a snake body part at given coords
-Snakebody::Snakebody(Game *game, unsigned int _x, unsigned int _y, sf::Color col = sf::Color::Yellow)
-    : game(game) {
-    x = _x;
-    y = _y;
-    body = sf::RectangleShape(sf::Vector2f(x, y));
-    body.setSize(sf::Vector2f(game->tilesize, game->tilesize));
-    body.setPosition(x * game->tilesize, y * game->tilesize);
-    body.setFillColor(col);
-}
+Snakebody::Snakebody(int x, int y, sf::Color col = sf::Color::Yellow) :
+    x(x), y(y) {}
 
-Snake::Snake(Game *game) : game(game) {}
+Snake::Snake(Game *game) :
+    game(game) {}
 
 void Snake::init(int a) {
     // Initialize a snake with one body part
     length = 1;
 
-    snake.push_back(Snakebody(game, a, 0));
-    // snake.push_back(Snakebody(game, 0, 1));
-    // snake.push_back(Snakebody(game, 0, 0));
+    snake.push_back(Snakebody(a, 0));
+    game->grid[0][a] = 1;
     dir = Direction::DOWN;
 }
 
 void Snake::update() {
+    if (snake[length - 1].x >= 0) {
+        game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
+        // game->map.changeColor(snake[length - 1].x, snake[length - 1].y);
+    }
+
     for (int i = length - 1; i >= 1; i--) {
         snake[i] = snake[i - 1];
-        snake[i].body.setPosition(snake[i].x * game->tilesize, snake[i].y * game->tilesize);
+        game->grid[snake[i].y][snake[i].x] = 1;
     }
 
     switch (dir) {
     case Direction::UP:
-        snake[0].y--;
+        snake[0].y = snake[0].y == 0 ? 0 : snake[0].y - 1;
         break;
 
     case Direction::DOWN:
-        snake[0].y++;
+        snake[0].y = snake[0].y == Config::ROWS - 1 ? Config::ROWS - 1 : snake[0].y + 1;
         break;
 
     case Direction::LEFT:
-        snake[0].x--;
+        snake[0].x = snake[0].x == 0 ? 0 : snake[0].x - 1;
         break;
 
     case Direction::RIGHT:
-        snake[0].x++;
+        snake[0].x = snake[0].x == Config::COLS - 1 ? Config::COLS - 1 : snake[0].x + 1;
         break;
 
     default:
         break;
     }
 
-    snake[0].body.setPosition(snake[0].x * game->tilesize, snake[0].y * game->tilesize);
-    // printbody(); // debugging
-}
-
-void Snake::printbody() {
-    std::cout << "-----------------" << std::endl;
-    for (unsigned int i = 0; i < length; i++) {
-        std::cout << snake[i].x << " | " << snake[i].y << "\n";
-    }
-    std::cout << "-----------------" << std::endl;
+    game->grid[snake[0].y][snake[0].x] = 1;
+    // game->map.changeColor(snake[0].x, snake[0].y);
 }
 
 void Snake::move(sf::Keyboard::Key key) {
@@ -93,7 +81,7 @@ void Snake::move(sf::Keyboard::Key key) {
         break;
 
     case sf::Keyboard::Enter:
-        snake.push_back(Snakebody(game, -1, -1));
+        snake.push_back(Snakebody(-1, -1));
         length++;
         break;
 

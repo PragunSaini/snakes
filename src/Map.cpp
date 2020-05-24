@@ -39,6 +39,24 @@ void Map::changeColor(int x, int y) {
     quad[3].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
 }
 
+void Map::updateMap() {
+    int width = Config::COLS;
+    int height = Config::ROWS;
+    int tilesize = game->tilesize;
+
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            int tilenumber = i + j * width;
+            sf::Vertex *quad = &tiles[tilenumber * 4];
+            int col = game->grid[j][i];
+            quad[0].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
+            quad[1].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
+            quad[2].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
+            quad[3].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
+        }
+    }
+}
+
 void Map::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(tiles, states);
 }

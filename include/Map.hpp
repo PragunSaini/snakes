@@ -15,6 +15,7 @@ public:
     Map(Game *);
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
     void changeColor(int x, int y);
+    void updateMap();
 };
 
 #endif

@@ -11,13 +11,10 @@ class Game;
 
 class Snakebody {
 public:
-    unsigned int x;
-    unsigned int y;
-    sf::RectangleShape body;
-    Game *game;
+    int x;
+    int y;
 
-    Snakebody(Game *);
-    Snakebody(Game *, unsigned int, unsigned int, sf::Color);
+    Snakebody(int, int, sf::Color);
 };
 
 class Snake {

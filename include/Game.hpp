@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "Config.hpp"
+#include "Food.hpp"
 #include "Map.hpp"
 #include "Random.hpp"
 #include "Snake.hpp"
@@ -22,6 +23,7 @@ public:
     std::vector<Snake> snake;
     sf::Font font;
     Random rand;
+    FoodManager foodManager;
 
     Game();
     void gameloop();

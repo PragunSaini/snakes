@@ -3,7 +3,8 @@
 Game::Game() :
     grid(std::vector<std::vector<int>>(Config::ROWS, std::vector<int>(Config::COLS, 0))),
     tilesize(Config::WIDTH / Config::COLS),
-    map(this) {
+    map(this),
+    foodManager(this) {
 
     // Initialize window
     window.create(sf::VideoMode(Config::WIDTH, Config::HEIGHT), "Snakes");
@@ -24,6 +25,8 @@ Game::Game() :
     map.updateMap();
 
     snakeSpeed = sf::seconds(1.0 / 30.0);
+
+    foodManager.init();
 }
 
 void Game::start() {

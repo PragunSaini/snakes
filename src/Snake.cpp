@@ -53,6 +53,12 @@ void Snake::update() {
             alive = false;
             die();
         }
+        else if (game->grid[snake[0].y][snake[0].x] == -1) {
+            snake.push_back(Snakebody(0, 0));
+            length++;
+            game->grid[snake[0].y][snake[0].x] = color;
+            game->foodManager.regenerate();
+        }
         else {
             game->grid[snake[0].y][snake[0].x] = color;
         }

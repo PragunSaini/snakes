@@ -1,6 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+#include <SFML/Graphics.hpp>
+
 namespace Config {
     const unsigned int WIDTH = 1280;
     const unsigned int HEIGHT = 720;

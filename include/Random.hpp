@@ -1,3 +1,6 @@
+#ifndef RANDOM_HPP
+#define RANDOM_HPP
+
 #include "Config.hpp"
 #include <chrono>
 #include <random>
@@ -12,3 +15,5 @@ public:
     int getX();
     int getY();
 };
+
+#endif

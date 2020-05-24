@@ -3,6 +3,7 @@
 
 #include "Config.hpp"
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 
 // forward declaration
 class Game;
@@ -16,6 +17,8 @@ public:
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
     void changeColor(int x, int y);
     void updateMap();
+
+    std::unordered_map<int, sf::Color> colMap;
 };
 
 #endif

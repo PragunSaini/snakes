@@ -2,19 +2,19 @@
 #include "Game.hpp"
 
 // Initialize a snake body part at given coords
-Snakebody::Snakebody(int x, int y, sf::Color col = sf::Color::Yellow) :
+Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
 
-Snake::Snake(Game *game) :
-    game(game) {}
+Snake::Snake(Game *game, int color) :
+    game(game), color(color) {
+}
 
 void Snake::init(int x, int y) {
     // Initialize a snake with one body part
     length = 1;
-
     snake.push_back(Snakebody(x, y));
     snake[0].newblock = false;
-    game->grid[y][x] = 1;
+    game->grid[y][x] = color;
     dir = Direction::DOWN;
 }
 
@@ -24,7 +24,7 @@ void Snake::update() {
 
     for (int i = length - 1; i >= 1; i--) {
         snake[i] = snake[i - 1];
-        game->grid[snake[i].y][snake[i].x] = 1;
+        game->grid[snake[i].y][snake[i].x] = color;
     }
 
     switch (dir) {
@@ -48,7 +48,7 @@ void Snake::update() {
         break;
     }
 
-    game->grid[snake[0].y][snake[0].x] = 1;
+    game->grid[snake[0].y][snake[0].x] = color;
     // game->map.changeColor(snake[0].x, snake[0].y);
 }
 

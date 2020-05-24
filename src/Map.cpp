@@ -4,6 +4,13 @@
 
 Map::Map(Game *game) :
     game(game) {
+
+    colMap = std::unordered_map<int, sf::Color>({{0, sf::Color::Black},
+                                                 {1, sf::Color::Magenta},
+                                                 {2, sf::Color::Cyan},
+                                                 {3, sf::Color::Green},
+                                                 {-1, sf::Color::Red}});
+
     int width = Config::COLS;
     int height = Config::ROWS;
     int tilesize = game->tilesize;
@@ -31,12 +38,11 @@ Map::Map(Game *game) :
 
 void Map::changeColor(int x, int y) {
     int tilenumber = x + y * Config::COLS;
-    int col = game->grid[y][x];
     sf::Vertex *quad = &tiles[tilenumber * 4];
-    quad[0].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
-    quad[1].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
-    quad[2].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
-    quad[3].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
+    quad[0].color = colMap[game->grid[y][x]];
+    quad[1].color = colMap[game->grid[y][x]];
+    quad[2].color = colMap[game->grid[y][x]];
+    quad[3].color = colMap[game->grid[y][x]];
 }
 
 void Map::updateMap() {
@@ -47,11 +53,10 @@ void Map::updateMap() {
         for (int j = 0; j < height; j++) {
             int tilenumber = i + j * width;
             sf::Vertex *quad = &tiles[tilenumber * 4];
-            int col = game->grid[j][i];
-            quad[0].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
-            quad[1].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
-            quad[2].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
-            quad[3].color = col == 0 ? sf::Color::Black : sf::Color::Yellow;
+            quad[0].color = colMap[game->grid[j][i]];
+            quad[1].color = colMap[game->grid[j][i]];
+            quad[2].color = colMap[game->grid[j][i]];
+            quad[3].color = colMap[game->grid[j][i]];
         }
     }
 }

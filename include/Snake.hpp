@@ -15,17 +15,18 @@ public:
     int y;
     bool newblock;
 
-    Snakebody(int, int, sf::Color);
+    Snakebody(int, int);
 };
 
 class Snake {
 public:
-    unsigned int length;
+    int length;
     std::vector<Snakebody> snake;
     Game *game;
     Direction dir;
+    int color;
 
-    Snake(Game *);
+    Snake(Game *, int = 1);
     void init(int, int);
     void move(sf::Keyboard::Key);
     void update();

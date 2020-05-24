@@ -6,7 +6,7 @@ Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
 
 Snake::Snake(Game *game, int color) :
-    game(game), color(color) {
+    game(game), color(color), alive(true) {
 }
 
 void Snake::init(int x, int y) {
@@ -19,37 +19,51 @@ void Snake::init(int x, int y) {
 }
 
 void Snake::update() {
-    if (!snake[length - 1].newblock)
-        game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
+    if (alive) {
+        if (!snake[length - 1].newblock)
+            game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
 
-    for (int i = length - 1; i >= 1; i--) {
-        snake[i] = snake[i - 1];
+        for (int i = length - 1; i >= 1; i--) {
+            snake[i] = snake[i - 1];
+            game->grid[snake[i].y][snake[i].x] = color;
+        }
+
+        switch (dir) {
+        case Direction::UP:
+            snake[0].y = snake[0].y == 0 ? 0 : snake[0].y - 1;
+            break;
+
+        case Direction::DOWN:
+            snake[0].y = snake[0].y == Config::ROWS - 1 ? Config::ROWS - 1 : snake[0].y + 1;
+            break;
+
+        case Direction::LEFT:
+            snake[0].x = snake[0].x == 0 ? 0 : snake[0].x - 1;
+            break;
+
+        case Direction::RIGHT:
+            snake[0].x = snake[0].x == Config::COLS - 1 ? Config::COLS - 1 : snake[0].x + 1;
+            break;
+
+        default:
+            break;
+        }
+
+        if (game->grid[snake[0].y][snake[0].x] > 0 && game->grid[snake[0].y][snake[0].x] < 10) {
+            alive = false;
+            die();
+        }
+        else {
+            game->grid[snake[0].y][snake[0].x] = color;
+        }
+    }
+}
+
+void Snake::die() {
+    color = 10 + color;
+    for (int i = 1; i < length; i++) {
         game->grid[snake[i].y][snake[i].x] = color;
     }
-
-    switch (dir) {
-    case Direction::UP:
-        snake[0].y = snake[0].y == 0 ? 0 : snake[0].y - 1;
-        break;
-
-    case Direction::DOWN:
-        snake[0].y = snake[0].y == Config::ROWS - 1 ? Config::ROWS - 1 : snake[0].y + 1;
-        break;
-
-    case Direction::LEFT:
-        snake[0].x = snake[0].x == 0 ? 0 : snake[0].x - 1;
-        break;
-
-    case Direction::RIGHT:
-        snake[0].x = snake[0].x == Config::COLS - 1 ? Config::COLS - 1 : snake[0].x + 1;
-        break;
-
-    default:
-        break;
-    }
-
-    game->grid[snake[0].y][snake[0].x] = color;
-    // game->map.changeColor(snake[0].x, snake[0].y);
 }
 
 void Snake::move(sf::Keyboard::Key key) {

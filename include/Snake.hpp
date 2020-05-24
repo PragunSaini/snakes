@@ -25,12 +25,13 @@ public:
     Game *game;
     Direction dir;
     int color;
+    bool alive;
 
     Snake(Game *, int = 1);
     void init(int, int);
     void move(sf::Keyboard::Key);
     void update();
-    void printbody();
+    void die();
 };
 
 #endif

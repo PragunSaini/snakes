@@ -27,6 +27,8 @@ public:
     Direction changedir;
     int color;
     bool alive;
+    int id;
+    static int ID;
 
     Snake(Game *, int = 1);
     void init(int, int);

@@ -17,7 +17,7 @@ Game::Game() :
 
     // Initialize snake
     std::srand(time(NULL));
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 2; i++) {
         snake.push_back(Snake(this, std::rand() % 3 + 1));
         snake[i].init(rand.getX(), rand.getY());
     }

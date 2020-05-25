@@ -5,8 +5,12 @@
 Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
 
+int Snake::ID = 0;
+
 Snake::Snake(Game *game, int color) :
     game(game), color(color), alive(true) {
+    id = ID;
+    ID++;
 }
 
 void Snake::init(int x, int y) {
@@ -19,6 +23,7 @@ void Snake::init(int x, int y) {
 }
 
 void Snake::update() {
+    std::cout << "Player : " << id << " | Score : " << (length - 1) << "\n";
     if (alive) {
         if (!snake[length - 1].newblock)
             game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
@@ -31,28 +36,24 @@ void Snake::update() {
         switch (changedir) {
         case Direction::UP:
             if (dir != Direction::DOWN) {
-                // snake[0].y = snake[0].y == 0 ? 0 : snake[0].y - 1;
                 dir = Direction::UP;
             }
             break;
 
         case Direction::DOWN:
             if (dir != Direction::UP) {
-                // snake[0].y = snake[0].y == Config::ROWS - 1 ? Config::ROWS - 1 : snake[0].y + 1;
                 dir = Direction::DOWN;
             }
             break;
 
         case Direction::LEFT:
             if (dir != Direction::RIGHT) {
-                // snake[0].x = snake[0].x == 0 ? 0 : snake[0].x - 1;
                 dir = Direction::LEFT;
             }
             break;
 
         case Direction::RIGHT:
             if (dir != Direction::LEFT) {
-                // snake[0].x = snake[0].x == Config::COLS - 1 ? Config::COLS - 1 : snake[0].x + 1;
                 dir = Direction::RIGHT;
             }
             break;
@@ -111,25 +112,49 @@ void Snake::move(sf::Keyboard::Key key) {
     // Move the snake
     switch (key) {
     case sf::Keyboard::Up:
-        if (dir != Direction::DOWN) {
+        if (dir != Direction::DOWN && id == 0) {
             changedir = Direction::UP;
         }
         break;
 
     case sf::Keyboard::Down:
-        if (dir != Direction::UP) {
+        if (dir != Direction::UP && id == 0) {
             changedir = Direction::DOWN;
         }
         break;
 
     case sf::Keyboard::Left:
-        if (dir != Direction::RIGHT) {
+        if (dir != Direction::RIGHT && id == 0) {
             changedir = Direction::LEFT;
         }
         break;
 
     case sf::Keyboard::Right:
-        if (dir != Direction::LEFT) {
+        if (dir != Direction::LEFT && id == 0) {
+            changedir = Direction::RIGHT;
+        }
+        break;
+
+    case sf::Keyboard::W:
+        if (dir != Direction::DOWN && id == 1) {
+            changedir = Direction::UP;
+        }
+        break;
+
+    case sf::Keyboard::S:
+        if (dir != Direction::UP && id == 1) {
+            changedir = Direction::DOWN;
+        }
+        break;
+
+    case sf::Keyboard::A:
+        if (dir != Direction::RIGHT && id == 1) {
+            changedir = Direction::LEFT;
+        }
+        break;
+
+    case sf::Keyboard::D:
+        if (dir != Direction::LEFT && id == 1) {
             changedir = Direction::RIGHT;
         }
         break;

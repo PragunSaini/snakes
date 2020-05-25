@@ -9,7 +9,7 @@ public:
     Game *game;
     int foodcount;
 
-    FoodManager(Game *, int = 25);
+    FoodManager(Game *, int = 50);
     void generateFood(bool = false);
     void init();
     void regenerate();

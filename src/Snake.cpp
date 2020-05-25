@@ -28,6 +28,11 @@ void Snake::update() {
             game->grid[snake[i].y][snake[i].x] = color;
         }
 
+        if (changedir == Direction::SAME) {
+            int m = rand() % 4;
+            changedir = (Direction)m;
+        }
+
         switch (changedir) {
         case Direction::UP:
             if (dir != Direction::DOWN) {

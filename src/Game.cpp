@@ -4,7 +4,8 @@ Game::Game() :
     grid(std::vector<std::vector<int>>(Config::ROWS, std::vector<int>(Config::COLS, 0))),
     tilesize(Config::WIDTH / Config::COLS),
     map(this),
-    foodManager(this) {
+    foodManager(this),
+    net({8, 30, 20, 4}) {
 
     // Initialize window
     window.create(sf::VideoMode(Config::WIDTH, Config::HEIGHT), "Snakes");
@@ -24,9 +25,15 @@ Game::Game() :
 
     map.updateMap();
 
-    snakeSpeed = sf::seconds(1.0 / 30.0);
+    snakeSpeed = sf::seconds(1.0 / Config::SNAKESPEED);
 
     foodManager.init();
+
+    std::vector<double> ans = net.feedforward({1, 0, -1, 0, 0, 1, 1, -1});
+    for (double a : ans) {
+        std::cout << a << " | ";
+    }
+    std::cout << "\n";
 }
 
 void Game::start() {

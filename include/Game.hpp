@@ -4,6 +4,7 @@
 #include "Config.hpp"
 #include "Food.hpp"
 #include "Map.hpp"
+#include "NN/NeuralNet.hpp"
 #include "Random.hpp"
 #include "Snake.hpp"
 #include <SFML/Graphics.hpp>
@@ -24,6 +25,7 @@ public:
     sf::Font font;
     Random rand;
     FoodManager foodManager;
+    NeuralNet net;
 
     Game();
     void gameloop();

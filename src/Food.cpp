@@ -6,7 +6,6 @@ FoodManager::FoodManager(Game *game, int foodcount) :
 }
 
 void FoodManager::init() {
-    std::cout << foodcount << "\n";
     for (int i = 0; i < foodcount; i++) {
         generateFood(true);
     }
@@ -20,7 +19,7 @@ void FoodManager::regenerate() {
 void FoodManager::generateFood(bool init) {
     int x, y;
     int limit = 0;
-    int timeout = foodcount > 1 ? 10 : 100;
+    int timeout = foodcount > 1 ? 100 : 500;
     do {
         limit++;
         x = game->rand.getX();

@@ -1,6 +1,8 @@
 #ifndef FOOD_MANAGER_HPP
 #define FOOD_MANAGER_HPP
 
+#include "Config.hpp"
+
 // forward declaration
 class Game;
 
@@ -9,7 +11,7 @@ public:
     Game *game;
     int foodcount;
 
-    FoodManager(Game *, int = 25);
+    FoodManager(Game *, int = Config::FOODCNT);
     void generateFood(bool = false);
     void init();
     void regenerate();

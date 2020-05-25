@@ -31,28 +31,24 @@ void Snake::update() {
         switch (changedir) {
         case Direction::UP:
             if (dir != Direction::DOWN) {
-                // snake[0].y = snake[0].y == 0 ? 0 : snake[0].y - 1;
                 dir = Direction::UP;
             }
             break;
 
         case Direction::DOWN:
             if (dir != Direction::UP) {
-                // snake[0].y = snake[0].y == Config::ROWS - 1 ? Config::ROWS - 1 : snake[0].y + 1;
                 dir = Direction::DOWN;
             }
             break;
 
         case Direction::LEFT:
             if (dir != Direction::RIGHT) {
-                // snake[0].x = snake[0].x == 0 ? 0 : snake[0].x - 1;
                 dir = Direction::LEFT;
             }
             break;
 
         case Direction::RIGHT:
             if (dir != Direction::LEFT) {
-                // snake[0].x = snake[0].x == Config::COLS - 1 ? Config::COLS - 1 : snake[0].x + 1;
                 dir = Direction::RIGHT;
             }
             break;

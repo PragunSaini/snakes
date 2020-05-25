@@ -8,13 +8,18 @@ SRC := src
 INCLUDE := include
 
 EXECUTABLE := main
-SOURCES := $(shell find $(SRC) -name *.cpp -execdir basename '{}' ';')
+# SOURCES := $(shell find $(SRC) -name *.cpp -execdir basename '{}' ';')
+SOURCES := $(shell find $(SRC) -name *.cpp | cut -d'/' -f2- )
 OBJS := $(patsubst %.cpp, %.o, $(SOURCES))
 DEPENDS := $(patsubst %.cpp, %.d, $(SOURCES))
+DIRS := bin bin/NN
 
 
-all: $(BIN)/$(EXECUTABLE)
+all: setup $(BIN)/$(EXECUTABLE)
 	@echo -e "\n\e[92mAll done\033[0m"
+
+setup:
+	@mkdir -p $(DIRS)
 
 -include $(DEPENDS:%=$(BIN)/%)
 
@@ -29,7 +34,8 @@ $(BIN)/%.o: $(SRC)/%.cpp Makefile
 
 
 clean:
-	$(RM) $(BIN)/*
+	# $(RM) $(BIN)/*
+	@rm -rf $(BIN)/*
 	@echo -e "\e[96mClean done\033[0m"
 
 

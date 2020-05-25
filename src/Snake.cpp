@@ -28,6 +28,41 @@ void Snake::update() {
             game->grid[snake[i].y][snake[i].x] = color;
         }
 
+        switch (changedir) {
+        case Direction::UP:
+            if (dir != Direction::DOWN) {
+                // snake[0].y = snake[0].y == 0 ? 0 : snake[0].y - 1;
+                dir = Direction::UP;
+            }
+            break;
+
+        case Direction::DOWN:
+            if (dir != Direction::UP) {
+                // snake[0].y = snake[0].y == Config::ROWS - 1 ? Config::ROWS - 1 : snake[0].y + 1;
+                dir = Direction::DOWN;
+            }
+            break;
+
+        case Direction::LEFT:
+            if (dir != Direction::RIGHT) {
+                // snake[0].x = snake[0].x == 0 ? 0 : snake[0].x - 1;
+                dir = Direction::LEFT;
+            }
+            break;
+
+        case Direction::RIGHT:
+            if (dir != Direction::LEFT) {
+                // snake[0].x = snake[0].x == Config::COLS - 1 ? Config::COLS - 1 : snake[0].x + 1;
+                dir = Direction::RIGHT;
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        changedir = Direction::SAME;
+
         switch (dir) {
         case Direction::UP:
             snake[0].y = snake[0].y == 0 ? 0 : snake[0].y - 1;
@@ -77,31 +112,26 @@ void Snake::move(sf::Keyboard::Key key) {
     switch (key) {
     case sf::Keyboard::Up:
         if (dir != Direction::DOWN) {
-            dir = Direction::UP;
+            changedir = Direction::UP;
         }
         break;
 
     case sf::Keyboard::Down:
         if (dir != Direction::UP) {
-            dir = Direction::DOWN;
+            changedir = Direction::DOWN;
         }
         break;
 
     case sf::Keyboard::Left:
         if (dir != Direction::RIGHT) {
-            dir = Direction::LEFT;
+            changedir = Direction::LEFT;
         }
         break;
 
     case sf::Keyboard::Right:
         if (dir != Direction::LEFT) {
-            dir = Direction::RIGHT;
+            changedir = Direction::RIGHT;
         }
-        break;
-
-    case sf::Keyboard::Enter:
-        snake.push_back(Snakebody(0, 0));
-        length++;
         break;
 
     default:

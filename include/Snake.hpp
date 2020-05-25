@@ -24,6 +24,7 @@ public:
     std::vector<Snakebody> snake;
     Game *game;
     Direction dir;
+    Direction changedir;
     int color;
     bool alive;
 

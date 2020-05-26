@@ -5,6 +5,7 @@
 #include "NN/NeuralNet.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 // forward declaration
@@ -21,10 +22,15 @@ public:
 };
 
 class Snake {
-    bool willHitWall();
+    static std::vector<std::pair<int, int>> visionDirs;
+
+    // bool willHitWall();
     void moveBody();
     void moveHead();
     void increaseLength();
+    bool inRange(int, int);
+    std::vector<double> objectEncoder(int);
+    std::vector<double> getVision();
 
 public:
     int length;

@@ -6,8 +6,19 @@ Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
 
 Snake::Snake(Game *game, int color) :
-    game(game), color(color), alive(true), net({28, 10, 4}) {
+    game(game), color(color), alive(true), net({28, 30, 10, 4}) {
 }
+
+std::vector<std::pair<int, int>> Snake::visionDirs = {
+    {0, -1}, // UP
+    {1, -1}, // UP-RIGHT
+    {1, 0},  // RIGHT
+    {1, 1},  // DOWN-RIGHT
+    {0, 1},  // DOWN
+    {-1, 1}, // DOWN-LEFT,
+    {-1, 0}, // LEFT
+    {-1, 1}  // UP-LEFT
+};
 
 void Snake::init(int x, int y) {
     // Initialize a snake with one body part
@@ -19,33 +30,33 @@ void Snake::init(int x, int y) {
     snake[0].dir = (Direction)(game->rand.getX() % 4);
 }
 
-bool Snake::willHitWall() {
-    switch (snake[0].dir) {
-    case Direction::UP:
-        if (snake[0].y == 0)
-            return true;
-        break;
+// bool Snake::willHitWall() {
+//     switch (snake[0].dir) {
+//     case Direction::UP:
+//         if (snake[0].y == 0)
+//             return true;
+//         break;
 
-    case Direction::DOWN:
-        if (snake[0].y == Config::ROWS - 1)
-            return true;
-        break;
+//     case Direction::DOWN:
+//         if (snake[0].y == Config::ROWS - 1)
+//             return true;
+//         break;
 
-    case Direction::LEFT:
-        if (snake[0].x == 0)
-            return true;
-        break;
+//     case Direction::LEFT:
+//         if (snake[0].x == 0)
+//             return true;
+//         break;
 
-    case Direction::RIGHT:
-        if (snake[0].x == Config::COLS - 1)
-            return true;
-        break;
+//     case Direction::RIGHT:
+//         if (snake[0].x == Config::COLS - 1)
+//             return true;
+//         break;
 
-    default:
-        return false;
-    }
-    return false;
-}
+//     default:
+//         return false;
+//     }
+//     return false;
+// }
 
 void Snake::moveBody() {
     if (!snake[length - 1].newblock)
@@ -118,16 +129,20 @@ void Snake::increaseLength() {
 }
 
 void Snake::update() {
-    if (alive && willHitWall()) {
-        die();
-    }
     if (alive) {
+        std::vector<double> res = net.feedforward(getVision());
+        int dist = std::distance(res.begin(), std::max_element(res.begin(), res.end()));
+        changedir = (Direction)dist;
+        std::cout << changedir << "\n";
+
         moveBody();
         moveHead();
 
-        if (game->grid[snake[0].y][snake[0].x] > 0 && game->grid[snake[0].y][snake[0].x] < 10) {
+        // Check if out of grid or eating a snake
+        if (!inRange(snake[0].x, snake[0].y) || (game->grid[snake[0].y][snake[0].x] > 0 && game->grid[snake[0].y][snake[0].x] < 10)) {
             die();
         }
+        // Check if eating food
         else if (game->grid[snake[0].y][snake[0].x] == -1) {
             increaseLength();
             game->grid[snake[0].y][snake[0].x] = color;
@@ -143,7 +158,10 @@ void Snake::die() {
     alive = false;
     color = 10 + color;
     for (int i = 0; i < length; i++) {
-        game->grid[snake[i].y][snake[i].x] = color;
+        if (i == 0 && inRange(snake[i].x, snake[i].y))
+            game->grid[snake[i].y][snake[i].x] = color;
+        if (i != 0)
+            game->grid[snake[i].y][snake[i].x] = color;
     }
 }
 
@@ -178,4 +196,55 @@ void Snake::move(sf::Keyboard::Key key) {
     default:
         break;
     }
+}
+
+std::vector<double> Snake::objectEncoder(int x) {
+    std::vector<double> res(3, 0);
+    if (x == -1) {
+        res[0] = 1;
+    }
+    else if (x > 0 && x < 10) {
+        res[1] = 1;
+    }
+    else {
+        res[2] = 1;
+    }
+    return res;
+}
+
+bool Snake::inRange(int x, int y) {
+    if (x >= 0 && y >= 0 && y < Config::ROWS && x < Config::COLS)
+        return true;
+    return false;
+}
+
+std::vector<double> Snake::getVision() {
+    std::vector<double> res;
+    res.reserve(28);
+
+    int visInd = ((int)snake[0].dir) * 2;
+    for (int i = 0; i < 8; i++) {
+        std::pair<int, int> d = visionDirs[visInd % 8];
+        visInd++;
+        int dx = snake[0].x;
+        int dy = snake[0].y;
+        int obj = 0;
+        do {
+            dx += d.first;
+            dy += d.second;
+            if (!inRange(dx, dy)) {
+                break;
+            }
+            if (game->grid[dy][dx] != 0 && game->grid[dy][dx] < 10) {
+                obj = game->grid[dy][dx];
+                break;
+            }
+        } while (true);
+        std::vector<double> encoding = objectEncoder(obj);
+        res.insert(res.end(), encoding.begin(), encoding.end());
+    }
+    std::vector<double> headDir(4, 0);
+    headDir[(int)snake[0].dir] = 1;
+    res.insert(res.end(), headDir.begin(), headDir.end());
+    return res;
 }

@@ -4,23 +4,23 @@
 #include <SFML/Graphics.hpp>
 
 namespace Config {
-    const unsigned int WIDTH = 1280;
-    const unsigned int HEIGHT = 720;
+    const int WIDTH = 1280; //1280
+    const int HEIGHT = 720; //720
 
-    const unsigned int FRAMERATE = 0; // set <= 0 for VSync
-    const unsigned int SNAKESPEED = 30;
+    const int FRAMERATE = 0; // set <= 0 for VSync
+    const int SNAKESPEED = 30;
 
-    const unsigned int ROWS = 90;
-    const unsigned int COLS = 160;
+    const int ROWS = 90;  // 90
+    const int COLS = 160; // 160
 
-    const unsigned int FOODCNT = 25;
+    const int FOODCNT = 25;
 } // namespace Config
 
 enum Direction {
     UP,
+    RIGHT,
     DOWN,
     LEFT,
-    RIGHT,
     SAME
 };
 

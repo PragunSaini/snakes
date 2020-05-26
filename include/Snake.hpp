@@ -2,6 +2,7 @@
 #define SNAKE_HPP
 
 #include "Config.hpp"
+#include "NN/NeuralNet.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -14,19 +15,25 @@ public:
     int x;
     int y;
     bool newblock;
+    Direction dir;
 
     Snakebody(int, int);
 };
 
 class Snake {
+    bool willHitWall();
+    void moveBody();
+    void moveHead();
+    void increaseLength();
+
 public:
     int length;
     std::vector<Snakebody> snake;
     Game *game;
-    Direction dir;
     Direction changedir;
     int color;
     bool alive;
+    NeuralNet net;
 
     Snake(Game *, int = 1);
     void init(int, int);

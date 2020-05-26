@@ -42,10 +42,11 @@ public:
     NeuralNet net;
     int score;
     int steps;
+    int stepsSinceFood;
 
     Snake(Game *, int = 1);
     void init(int, int);
-    void move(sf::Keyboard::Key);
+    // void move(sf::Keyboard::Key);
     void update();
     void die();
 };

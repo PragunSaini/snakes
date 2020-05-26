@@ -13,17 +13,18 @@
 
 class Game {
 public:
-    sf::RenderWindow window;
+    // sf::RenderWindow window;
     std::vector<std::vector<int>> grid;
     int tilesize;
-    Map map;
+    // Map map;
     sf::Clock frametime;
     sf::Time snakeSpeed;
     sf::Clock snakeupdate;
-    std::vector<Snake> snake;
-    sf::Font font;
-    Random rand;
+    // std::vector<Snake> snake;
     FoodManager foodManager;
+    Snake snake;
+    // sf::Font font;
+    Random rand;
 
     Game();
     void gameloop();
@@ -31,6 +32,7 @@ public:
     void draw();
     void eventManager(sf::Event);
     void initSnake();
+    void move();
 };
 
 #endif

@@ -1,6 +1,8 @@
 #include "Game.hpp"
 
 int main() {
-    Game game;
-    game.start();
+    for (int i = 0; i < 500; i++) {
+        Game game;
+        game.start();
+    }
 }

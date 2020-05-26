@@ -30,6 +30,7 @@ void Snake::init(int x, int y) {
     snake[0].dir = (Direction)(game->rand.getX() % 4);
     score = 0;
     steps = 0;
+    stepsSinceFood = 0;
 }
 
 // bool Snake::willHitWall() {
@@ -127,11 +128,14 @@ void Snake::moveHead() {
 
 void Snake::increaseLength() {
     snake.push_back(Snakebody(0, 0));
+    snake[length].dir = snake[length - 1].dir;
     length++;
 }
 
 void Snake::update() {
     if (alive) {
+        stepsSinceFood++;
+
         std::vector<double> res = net.feedforward(getVision());
         int dist = std::distance(res.begin(), std::max_element(res.begin(), res.end()));
         changedir = (Direction)dist;
@@ -146,6 +150,7 @@ void Snake::update() {
         }
         // Check if eating food
         else if (game->grid[snake[0].y][snake[0].x] == -1) {
+            stepsSinceFood = 0;
             increaseLength();
             score++;
             game->grid[snake[0].y][snake[0].x] = color;
@@ -153,6 +158,10 @@ void Snake::update() {
         }
         else {
             game->grid[snake[0].y][snake[0].x] = color;
+        }
+
+        if (stepsSinceFood >= Config::COLS * Config::ROWS) {
+            die();
         }
     }
 }
@@ -169,38 +178,38 @@ void Snake::die() {
     std::cout << "Score : " << score << " | Steps : " << steps << "\n";
 }
 
-void Snake::move(sf::Keyboard::Key key) {
-    Direction dir = snake[0].dir;
-    // Move the snake
-    switch (key) {
-    case sf::Keyboard::Up:
-        if (dir != Direction::DOWN) {
-            changedir = Direction::UP;
-        }
-        break;
+// void Snake::move(sf::Keyboard::Key key) {
+//     Direction dir = snake[0].dir;
+//     // Move the snake
+//     switch (key) {
+//     case sf::Keyboard::Up:
+//         if (dir != Direction::DOWN) {
+//             changedir = Direction::UP;
+//         }
+//         break;
 
-    case sf::Keyboard::Down:
-        if (dir != Direction::UP) {
-            changedir = Direction::DOWN;
-        }
-        break;
+//     case sf::Keyboard::Down:
+//         if (dir != Direction::UP) {
+//             changedir = Direction::DOWN;
+//         }
+//         break;
 
-    case sf::Keyboard::Left:
-        if (dir != Direction::RIGHT) {
-            changedir = Direction::LEFT;
-        }
-        break;
+//     case sf::Keyboard::Left:
+//         if (dir != Direction::RIGHT) {
+//             changedir = Direction::LEFT;
+//         }
+//         break;
 
-    case sf::Keyboard::Right:
-        if (dir != Direction::LEFT) {
-            changedir = Direction::RIGHT;
-        }
-        break;
+//     case sf::Keyboard::Right:
+//         if (dir != Direction::LEFT) {
+//             changedir = Direction::RIGHT;
+//         }
+//         break;
 
-    default:
-        break;
-    }
-}
+//     default:
+//         break;
+//     }
+// }
 
 std::vector<double> Snake::objectEncoder(int x) {
     std::vector<double> res(3, 0);

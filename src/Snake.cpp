@@ -6,7 +6,7 @@ Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
 
 Snake::Snake(Game *game, int color) :
-    game(game), color(color), alive(true), net({28, 30, 10, 4}) {
+    game(game), color(color), alive(true), net({32, 20, 10, 4}) {
 }
 
 std::vector<std::pair<int, int>> Snake::visionDirs = {
@@ -220,7 +220,7 @@ bool Snake::inRange(int x, int y) {
 
 std::vector<double> Snake::getVision() {
     std::vector<double> res;
-    res.reserve(28);
+    res.reserve(32);
 
     int visInd = ((int)snake[0].dir) * 2;
     for (int i = 0; i < 8; i++) {
@@ -246,5 +246,9 @@ std::vector<double> Snake::getVision() {
     std::vector<double> headDir(4, 0);
     headDir[(int)snake[0].dir] = 1;
     res.insert(res.end(), headDir.begin(), headDir.end());
+
+    std::vector<double> tailDir(4, 0);
+    tailDir[(int)snake[length - 1].dir] = 1;
+    res.insert(res.end(), tailDir.begin(), tailDir.end());
     return res;
 }

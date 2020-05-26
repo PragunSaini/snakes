@@ -6,7 +6,7 @@ Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
 
 Snake::Snake(Game *game, int color) :
-    game(game), color(color), alive(true), net({32, 20, 10, 4}) {
+    game(game), color(color), alive(true), net({32, 20, 12, 4}) {
 }
 
 std::vector<std::pair<int, int>> Snake::visionDirs = {
@@ -28,6 +28,8 @@ void Snake::init(int x, int y) {
     game->grid[y][x] = color;
     // dir = Direction::DOWN;
     snake[0].dir = (Direction)(game->rand.getX() % 4);
+    score = 0;
+    steps = 0;
 }
 
 // bool Snake::willHitWall() {
@@ -133,10 +135,10 @@ void Snake::update() {
         std::vector<double> res = net.feedforward(getVision());
         int dist = std::distance(res.begin(), std::max_element(res.begin(), res.end()));
         changedir = (Direction)dist;
-        std::cout << changedir << "\n";
 
         moveBody();
         moveHead();
+        steps++;
 
         // Check if out of grid or eating a snake
         if (!inRange(snake[0].x, snake[0].y) || (game->grid[snake[0].y][snake[0].x] > 0 && game->grid[snake[0].y][snake[0].x] < 10)) {
@@ -145,6 +147,7 @@ void Snake::update() {
         // Check if eating food
         else if (game->grid[snake[0].y][snake[0].x] == -1) {
             increaseLength();
+            score++;
             game->grid[snake[0].y][snake[0].x] = color;
             game->foodManager.regenerate();
         }
@@ -163,6 +166,7 @@ void Snake::die() {
         if (i != 0)
             game->grid[snake[i].y][snake[i].x] = color;
     }
+    std::cout << "Score : " << score << " | Steps : " << steps << "\n";
 }
 
 void Snake::move(sf::Keyboard::Key key) {

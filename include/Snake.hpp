@@ -40,6 +40,8 @@ public:
     int color;
     bool alive;
     NeuralNet net;
+    int score;
+    int steps;
 
     Snake(Game *, int = 1);
     void init(int, int);

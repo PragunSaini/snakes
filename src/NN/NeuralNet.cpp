@@ -31,11 +31,21 @@ std::vector<std::vector<double>> RandomHelper::getWeight(int m, int n) {
     return weights;
 }
 
-NeuralNet::NeuralNet(std::vector<int> sizes) :
+NeuralNet::NeuralNet() {}
+
+NeuralNet::NeuralNet(const std::vector<int> &sizes) :
     sizes(sizes),
     layers(sizes.size()) {
     actFuncs.resize(layers - 1, ActivationFuncs::sigmoid);
     weightInitializer();
+}
+
+NeuralNet::NeuralNet(const std::vector<int> &sizes, const std::vector<VecWeights> &w, const std::vector<VecBiases> &b) :
+    sizes(sizes),
+    layers(sizes.size()) {
+    actFuncs.resize(layers - 1, ActivationFuncs::sigmoid);
+    weights = w;
+    biases = b;
 }
 
 void NeuralNet::weightInitializer() {
@@ -50,7 +60,7 @@ void NeuralNet::weightInitializer() {
     }
 }
 
-std::vector<double> NeuralNet::dot(VecWeights w, std::vector<double> inputs) {
+std::vector<double> NeuralNet::dot(const VecWeights &w, const std::vector<double> &inputs) {
     int m = w.size();
     int n = w[0].size();
     std::vector<double> res(m);
@@ -64,7 +74,7 @@ std::vector<double> NeuralNet::dot(VecWeights w, std::vector<double> inputs) {
     return res;
 }
 
-std::vector<double> NeuralNet::add(std::vector<double> inputs, VecBiases b) {
+std::vector<double> NeuralNet::add(const std::vector<double> &inputs, const VecBiases &b) {
     int m = b.size();
     std::vector<double> res(m);
     for (int i = 0; i < m; i++) {
@@ -73,7 +83,7 @@ std::vector<double> NeuralNet::add(std::vector<double> inputs, VecBiases b) {
     return res;
 }
 
-std::vector<double> NeuralNet::activate(std::vector<double> inputs, int layer) {
+std::vector<double> NeuralNet::activate(const std::vector<double> &inputs, int layer) {
     double (*actFunc)(double) = layer == -1 ? ActivationFuncs::sigmoid : actFuncs[layer];
     int m = inputs.size();
     std::vector<double> res(m);

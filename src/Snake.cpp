@@ -1,14 +1,13 @@
 #include "Snake.hpp"
 #include "Game.hpp"
 
-// Initialize a snake body part at given coords
 Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
 
-Snake::Snake(Game *game, int color) :
-    game(game), color(color), alive(true), net({32, 20, 12, 4}) {
-}
+Snakebody::Snakebody(int x, int y, Direction dir) :
+    x(x), y(y), newblock(true), dir(dir) {}
 
+// Directions for snake vision
 std::vector<std::pair<int, int>> Snake::visionDirs = {
     {0, -1}, // UP
     {1, -1}, // UP-RIGHT
@@ -20,47 +19,36 @@ std::vector<std::pair<int, int>> Snake::visionDirs = {
     {-1, 1}  // UP-LEFT
 };
 
-void Snake::init(int x, int y) {
-    // Initialize a snake with one body part
+Snake::Snake(Game *game, int color) :
+    game(game), color(color), alive(true) {
+}
+
+void Snake::initFields() {
+    int x = game->rand.getX();
+    int y = game->rand.getY();
+
     length = 1;
-    snake.push_back(Snakebody(x, y));
+    snake.push_back(Snakebody(x, y, (Direction)(game->rand.getX() % 4)));
     snake[0].newblock = false;
     game->grid[y][x] = color;
-    // dir = Direction::DOWN;
-    snake[0].dir = (Direction)(game->rand.getX() % 4);
+
     score = 0;
     steps = 0;
     stepsSinceFood = 0;
 }
 
-// bool Snake::willHitWall() {
-//     switch (snake[0].dir) {
-//     case Direction::UP:
-//         if (snake[0].y == 0)
-//             return true;
-//         break;
+void Snake::init(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b) {
+    initFields();
+    // Default initalize NN weights or from params
+    if (!w.empty() && !b.empty()) {
+        net = NeuralNet(Config::LAYERS, w, b);
+    }
+    else {
+        net = NeuralNet(Config::LAYERS);
+    }
+}
 
-//     case Direction::DOWN:
-//         if (snake[0].y == Config::ROWS - 1)
-//             return true;
-//         break;
-
-//     case Direction::LEFT:
-//         if (snake[0].x == 0)
-//             return true;
-//         break;
-
-//     case Direction::RIGHT:
-//         if (snake[0].x == Config::COLS - 1)
-//             return true;
-//         break;
-
-//     default:
-//         return false;
-//     }
-//     return false;
-// }
-
+// Move snakes body except the head
 void Snake::moveBody() {
     if (!snake[length - 1].newblock)
         game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
@@ -71,6 +59,7 @@ void Snake::moveBody() {
     }
 }
 
+// Move snakes head
 void Snake::moveHead() {
     Direction &dir = snake[0].dir;
     switch (changedir) {
@@ -126,20 +115,30 @@ void Snake::moveHead() {
     }
 }
 
+// Add snakebody to snake
 void Snake::increaseLength() {
-    snake.push_back(Snakebody(0, 0));
-    snake[length].dir = snake[length - 1].dir;
+    snake.push_back(Snakebody(0, 0, snake[length - 1].dir));
     length++;
 }
 
+// Check snake in grid
+bool Snake::inRange(int x, int y) {
+    if (x >= 0 && y >= 0 && y < Config::ROWS && x < Config::COLS)
+        return true;
+    return false;
+}
+
+// Update snakes position (aka move snake)
 void Snake::update() {
     if (alive) {
         stepsSinceFood++;
 
+        // Find direction to move in using NN
         std::vector<double> res = net.feedforward(getVision());
         int dist = std::distance(res.begin(), std::max_element(res.begin(), res.end()));
         changedir = (Direction)dist;
 
+        // Move snake
         moveBody();
         moveHead();
         steps++;
@@ -153,13 +152,14 @@ void Snake::update() {
             stepsSinceFood = 0;
             increaseLength();
             score++;
-            game->grid[snake[0].y][snake[0].x] = color;
             game->foodManager.regenerate();
+            game->grid[snake[0].y][snake[0].x] = color;
         }
         else {
             game->grid[snake[0].y][snake[0].x] = color;
         }
 
+        // If snake takes too long to eat, it dies
         if (stepsSinceFood >= Config::COLS * Config::ROWS) {
             die();
         }
@@ -175,42 +175,17 @@ void Snake::die() {
         if (i != 0)
             game->grid[snake[i].y][snake[i].x] = color;
     }
-    std::cout << "Score : " << score << " | Steps : " << steps << "\n";
+    calculateFitness();
 }
 
-// void Snake::move(sf::Keyboard::Key key) {
-//     Direction dir = snake[0].dir;
-//     // Move the snake
-//     switch (key) {
-//     case sf::Keyboard::Up:
-//         if (dir != Direction::DOWN) {
-//             changedir = Direction::UP;
-//         }
-//         break;
+void Snake::calculateFitness() {
+    // fitness = steps +
+    //           (std::pow(2, score) + std::pow(score, 2.1) * 500) -
+    //           (std::pow(0.25 * steps, 1.3) * std::pow(score, 1.2));
+    fitness = steps + 100 * score - steps * 0.5;
+}
 
-//     case sf::Keyboard::Down:
-//         if (dir != Direction::UP) {
-//             changedir = Direction::DOWN;
-//         }
-//         break;
-
-//     case sf::Keyboard::Left:
-//         if (dir != Direction::RIGHT) {
-//             changedir = Direction::LEFT;
-//         }
-//         break;
-
-//     case sf::Keyboard::Right:
-//         if (dir != Direction::LEFT) {
-//             changedir = Direction::RIGHT;
-//         }
-//         break;
-
-//     default:
-//         break;
-//     }
-// }
-
+// Utility function to encode an object in vision
 std::vector<double> Snake::objectEncoder(int x) {
     std::vector<double> res(3, 0);
     if (x == -1) {
@@ -225,12 +200,9 @@ std::vector<double> Snake::objectEncoder(int x) {
     return res;
 }
 
-bool Snake::inRange(int x, int y) {
-    if (x >= 0 && y >= 0 && y < Config::ROWS && x < Config::COLS)
-        return true;
-    return false;
-}
-
+// Get a one hot encoded boolean array of snakes vision
+// Looks in 8 directions clockwise and reports first thing it sees
+// Also encodes directions of head and tail
 std::vector<double> Snake::getVision() {
     std::vector<double> res;
     res.reserve(32);
@@ -265,3 +237,37 @@ std::vector<double> Snake::getVision() {
     res.insert(res.end(), tailDir.begin(), tailDir.end());
     return res;
 }
+
+// For keyboard movement
+// void Snake::move(sf::Keyboard::Key key) {
+//     Direction dir = snake[0].dir;
+//     // Move the snake
+//     switch (key) {
+//     case sf::Keyboard::Up:
+//         if (dir != Direction::DOWN) {
+//             changedir = Direction::UP;
+//         }
+//         break;
+
+//     case sf::Keyboard::Down:
+//         if (dir != Direction::UP) {
+//             changedir = Direction::DOWN;
+//         }
+//         break;
+
+//     case sf::Keyboard::Left:
+//         if (dir != Direction::RIGHT) {
+//             changedir = Direction::LEFT;
+//         }
+//         break;
+
+//     case sf::Keyboard::Right:
+//         if (dir != Direction::LEFT) {
+//             changedir = Direction::RIGHT;
+//         }
+//         break;
+
+//     default:
+//         break;
+//     }
+// }

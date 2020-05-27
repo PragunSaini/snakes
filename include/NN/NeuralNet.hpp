@@ -6,12 +6,14 @@
 #include <random>
 #include <vector>
 
+// Activation Functions
 namespace ActivationFuncs {
     double sigmoid(double);
     double relu(double);
 
 } // namespace ActivationFuncs
 
+// Random number generators for weights and biases
 class RandomHelper {
 public:
     std::mt19937 gen;
@@ -22,8 +24,10 @@ public:
     std::vector<std::vector<double>> getWeight(int, int);
 };
 
+// Feedforward Neural Network
 class NeuralNet {
 public:
+    // Shorter types
     typedef std::vector<double> VecBiases;
     typedef std::vector<std::vector<double>> VecWeights;
 

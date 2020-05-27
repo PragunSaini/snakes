@@ -12,6 +12,7 @@ RandomHelper::RandomHelper() :
     gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())),
     randn(std::normal_distribution<double>(0.0, 1.0)) {}
 
+// Returns biases for a layer of size m
 std::vector<double> RandomHelper::getBias(int m) {
     std::vector<double> biases(m);
     for (int i = 0; i < m; i++) {
@@ -20,6 +21,7 @@ std::vector<double> RandomHelper::getBias(int m) {
     return biases;
 }
 
+// Returns weights for layer n to m
 std::vector<std::vector<double>> RandomHelper::getWeight(int m, int n) {
     std::vector<std::vector<double>> weights(m, std::vector<double>(n));
     double div = std::sqrt(n);
@@ -93,6 +95,7 @@ std::vector<double> NeuralNet::activate(const std::vector<double> &inputs, int l
     return res;
 }
 
+// Feedforward the inputs to get outputs
 std::vector<double> NeuralNet::feedforward(std::vector<double> inputs) {
     for (int i = 0; i < layers - 1; i++) {
         inputs = activate(add(dot(weights[i], inputs), biases[i]), i);

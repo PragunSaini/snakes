@@ -5,20 +5,17 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 
-// forward declaration
-class Game;
-
+// VertexArray for fast rendering of whole grid
 class Map : public sf::Drawable {
+    static std::unordered_map<int, sf::Color> colMap;
+
 public:
-    Game *game;
     sf::VertexArray tiles;
 
-    Map(Game *);
+    Map();
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
-    void changeColor(int x, int y);
-    void updateMap();
-
-    std::unordered_map<int, sf::Color> colMap;
+    void changeColor(int x, int y, int color);
+    void updateMap(const std::vector<std::vector<int>> &grid);
 };
 
 #endif

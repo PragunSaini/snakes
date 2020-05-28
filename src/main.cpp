@@ -1,8 +1,9 @@
-#include "Game.hpp"
+// #include "Genetic/Genetic.hpp"
+#include "Config.hpp"
+#include "Genetic/Genetic.hpp"
+#include <iostream>
 
 int main() {
-    for (int i = 0; i < 500; i++) {
-        Game game;
-        game.start();
-    }
+    GeneticAlgo gen;
+    gen.start();
 }

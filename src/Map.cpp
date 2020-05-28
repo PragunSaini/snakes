@@ -1,22 +1,19 @@
 #include "Map.hpp"
-#include "Game.hpp"
 #include <iostream>
 
-Map::Map(Game *game) :
-    game(game) {
+std::unordered_map<int, sf::Color> Map::colMap = std::unordered_map<int, sf::Color>({{0, sf::Color::Black},
+                                                                                     {1, sf::Color(255, 20, 147)},
+                                                                                     {11, sf::Color(155, 20, 47, 100)},
+                                                                                     {2, sf::Color(0, 255, 255, 255)},
+                                                                                     {12, sf::Color(0, 100, 100, 50)},
+                                                                                     {3, sf::Color(0, 255, 0)},
+                                                                                     {13, sf::Color(0, 155, 0, 70)},
+                                                                                     {-1, sf::Color::Red}});
 
-    colMap = std::unordered_map<int, sf::Color>({{0, sf::Color::Black},
-                                                 {1, sf::Color(255, 20, 147)},
-                                                 {11, sf::Color(155, 20, 47, 100)},
-                                                 {2, sf::Color(0, 255, 255, 255)},
-                                                 {12, sf::Color(0, 100, 100, 50)},
-                                                 {3, sf::Color(0, 255, 0)},
-                                                 {13, sf::Color(0, 155, 0, 70)},
-                                                 {-1, sf::Color::Red}});
-
+Map::Map() {
     int width = Config::COLS;
     int height = Config::ROWS;
-    int tilesize = game->tilesize;
+    int tilesize = Config::WIDTH / Config::COLS;
 
     tiles.setPrimitiveType(sf::Quads);
     tiles.resize(width * height * 4);
@@ -39,16 +36,18 @@ Map::Map(Game *game) :
     }
 }
 
-void Map::changeColor(int x, int y) {
+// Update Map at (x, y)
+void Map::changeColor(int x, int y, int color) {
     int tilenumber = x + y * Config::COLS;
     sf::Vertex *quad = &tiles[tilenumber * 4];
-    quad[0].color = colMap[game->grid[y][x]];
-    quad[1].color = colMap[game->grid[y][x]];
-    quad[2].color = colMap[game->grid[y][x]];
-    quad[3].color = colMap[game->grid[y][x]];
+    quad[0].color = colMap[color];
+    quad[1].color = colMap[color];
+    quad[2].color = colMap[color];
+    quad[3].color = colMap[color];
 }
 
-void Map::updateMap() {
+// Update whole 2D Map
+void Map::updateMap(const std::vector<std::vector<int>> &grid) {
     int width = Config::COLS;
     int height = Config::ROWS;
 
@@ -56,14 +55,15 @@ void Map::updateMap() {
         for (int j = 0; j < height; j++) {
             int tilenumber = i + j * width;
             sf::Vertex *quad = &tiles[tilenumber * 4];
-            quad[0].color = colMap[game->grid[j][i]];
-            quad[1].color = colMap[game->grid[j][i]];
-            quad[2].color = colMap[game->grid[j][i]];
-            quad[3].color = colMap[game->grid[j][i]];
+            quad[0].color = colMap[grid[j][i]];
+            quad[1].color = colMap[grid[j][i]];
+            quad[2].color = colMap[grid[j][i]];
+            quad[3].color = colMap[grid[j][i]];
         }
     }
 }
 
+// Overriden abstract function definition
 void Map::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(tiles, states);
 }

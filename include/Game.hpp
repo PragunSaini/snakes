@@ -6,33 +6,24 @@
 #include "Map.hpp"
 #include "Random.hpp"
 #include "Snake.hpp"
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
 #include <iostream>
 #include <vector>
 
 class Game {
+protected:
+    void init(const std::vector<NeuralNet::VecWeights> &w = {}, const std::vector<NeuralNet::VecBiases> &b = {});
+
 public:
-    // sf::RenderWindow window;
     std::vector<std::vector<int>> grid;
-    int tilesize;
-    // Map map;
-    sf::Clock frametime;
-    sf::Time snakeSpeed;
-    sf::Clock snakeupdate;
-    // std::vector<Snake> snake;
     FoodManager foodManager;
     Snake snake;
-    // sf::Font font;
     Random rand;
 
     Game();
-    void gameloop();
-    void start();
-    void draw();
-    void eventManager(sf::Event);
-    void initSnake();
-    void move();
+    Game(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b);
+    Game(const Game &);
+    Game &operator=(const Game &);
+    virtual void start() = 0;
 };
 
 #endif

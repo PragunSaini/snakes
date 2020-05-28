@@ -12,7 +12,7 @@ EXECUTABLE := main
 SOURCES := $(shell find $(SRC) -name *.cpp | cut -d'/' -f2- )
 OBJS := $(patsubst %.cpp, %.o, $(SOURCES))
 DEPENDS := $(patsubst %.cpp, %.d, $(SOURCES))
-DIRS := bin bin/NN
+DIRS := bin bin/NN bin/Genetic
 
 
 all: setup $(BIN)/$(EXECUTABLE)

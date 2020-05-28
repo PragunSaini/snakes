@@ -18,6 +18,7 @@ class RandomHelper {
 public:
     std::mt19937 gen;
     std::normal_distribution<double> randn;
+    std::uniform_real_distribution<double> rand;
 
     RandomHelper();
     std::vector<double> getBias(int);

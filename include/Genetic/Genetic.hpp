@@ -14,30 +14,32 @@ private:
     typedef std::vector<double> VecBiases;
     typedef std::vector<std::vector<double>> VecWeights;
 
-    std::mt19937 gen;
-    std::normal_distribution<double> randn;
-    std::uniform_real_distribution<double> rand;
+    static std::mt19937 gen;
+    static std::normal_distribution<double> randn;
+    static std::uniform_real_distribution<double> rand;
+    static int generations;
+    static int popSize;
+    static int offSpringSize;
+    static double etaX;
+    static double mutationProb;
 
-    int generations;
+    static std::pair<VecWeights, VecWeights> simulatedBinaryCrossover(const VecWeights &, const VecWeights &);
+    static std::pair<VecBiases, VecBiases> simulatedBinaryCrossover(const VecBiases &, const VecBiases &);
+    static void gaussianMutation(VecWeights &);
+    static void gaussianMutation(VecBiases &);
+
     int currGen;
-    int popsize;
-    int newpopsize;
-    double eta;
-    double mut_prob;
-
-    std::vector<Individual> games;
-
-    std::pair<VecWeights, VecWeights> simulatedBinaryCrossover(const VecWeights &, const VecWeights &);
-    std::pair<VecBiases, VecBiases> simulatedBinaryCrossover(const VecBiases &, const VecBiases &);
-    void gaussianMutation(VecWeights &);
-    void gaussianMutation(VecBiases &);
+    std::vector<Individual> population;
+    std::vector<Individual> offsprings;
 
 public:
     GeneticAlgo();
     void start();
-    void playgames();
-    std::vector<Individual> selection();
+    void calculateFitness(std::vector<Individual> &);
+    void parentSelection();
     void crossoverAndMutation();
+    void populationSelection();
+    std::vector<Individual> selection();
 };
 
 #endif

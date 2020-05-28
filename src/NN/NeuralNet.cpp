@@ -10,13 +10,15 @@ double ActivationFuncs::sigmoid(double z) {
 
 RandomHelper::RandomHelper() :
     gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())),
-    randn(std::normal_distribution<double>(0.0, 1.0)) {}
+    randn(std::normal_distribution<double>(0.0, 1.0)),
+    rand(std::uniform_real_distribution<double>(0, 1)) {}
 
 // Returns biases for a layer of size m
 std::vector<double> RandomHelper::getBias(int m) {
     std::vector<double> biases(m);
     for (int i = 0; i < m; i++) {
         biases[i] = randn(gen);
+        // biases[i] = rand(gen);
     }
     return biases;
 }
@@ -27,7 +29,9 @@ std::vector<std::vector<double>> RandomHelper::getWeight(int m, int n) {
     double div = std::sqrt(n);
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            weights[i][j] = randn(gen) / div;
+            // weights[i][j] = randn(gen) / div;
+            weights[i][j] = randn(gen);
+            // weights[i][j] = rand(gen);
         }
     }
     return weights;

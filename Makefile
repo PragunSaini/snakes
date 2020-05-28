@@ -1,5 +1,5 @@
 CXX := g++
-CXX_FLAGS := -std=c++11 -ggdb
+CXX_FLAGS := -std=c++11 -ggdb -O3 -fopenmp
 LIBRARIES := -lsfml-graphics -lsfml-window -lsfml-system
 WARNING := -Wall -Wextra
 

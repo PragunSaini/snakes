@@ -27,10 +27,29 @@ void Snake::initFields() {
     int x = game->rand.getX();
     int y = game->rand.getY();
 
-    length = 1;
-    snake.push_back(Snakebody(x, y, (Direction)(game->rand.getX() % 4)));
+    length = 3;
+    snake.push_back(Snakebody(x, y, (Direction)((game->rand.getX() % 2) * 2 + 1)));
     snake[0].newblock = false;
     game->grid[y][x] = color;
+
+    if (snake[0].dir == Direction::RIGHT) {
+        snake.push_back(Snakebody(x - 1, y, Direction::RIGHT));
+        snake[1].newblock = false;
+        game->grid[snake[1].y][snake[1].x] = color;
+
+        snake.push_back(Snakebody(x - 2, y, Direction::RIGHT));
+        snake[2].newblock = false;
+        game->grid[snake[2].y][snake[2].x] = color;
+    }
+    else {
+        snake.push_back(Snakebody(x + 1, y, Direction::LEFT));
+        snake[1].newblock = false;
+        game->grid[snake[1].y][snake[1].x] = color;
+
+        snake.push_back(Snakebody(x + 2, y, Direction::RIGHT));
+        snake[2].newblock = false;
+        game->grid[snake[2].y][snake[2].x] = color;
+    }
 
     score = 0;
     steps = 0;
@@ -183,8 +202,11 @@ void Snake::calculateFitness() {
               (std::pow(2, score) + std::pow(score, 2.1) * 500) -
               (std::pow(0.25 * steps, 1.3) * std::pow(score, 1.2));
     fitness = std::max(fitness, .1);
+
     // fitness = steps + 100 * score - steps * 0.5;
     // fitness = score;
+
+    // fitness = steps + std::pow(2, score);
 }
 
 // Utility function to encode an object in vision

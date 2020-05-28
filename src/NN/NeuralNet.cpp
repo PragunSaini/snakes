@@ -39,6 +39,7 @@ NeuralNet::NeuralNet(const std::vector<int> &sizes) :
     sizes(sizes),
     layers(sizes.size()) {
     actFuncs.resize(layers - 1, ActivationFuncs::sigmoid);
+    actFuncs[layers - 2] = ActivationFuncs::relu;
     weightInitializer();
 }
 
@@ -46,6 +47,7 @@ NeuralNet::NeuralNet(const std::vector<int> &sizes, const std::vector<VecWeights
     sizes(sizes),
     layers(sizes.size()) {
     actFuncs.resize(layers - 1, ActivationFuncs::sigmoid);
+    actFuncs[layers - 2] = ActivationFuncs::relu;
     weights = w;
     biases = b;
 }

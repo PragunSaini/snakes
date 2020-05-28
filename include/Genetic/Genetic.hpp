@@ -1,7 +1,8 @@
 #ifndef GENETIC_CPP
 #define GENETIC_CPP
 
-#include "Individual.hpp"
+#include "Genetic/Individual.hpp"
+#include "Render.hpp"
 #include <algorithm>
 #include <iostream>
 #include <random>

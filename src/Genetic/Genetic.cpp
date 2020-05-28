@@ -1,14 +1,12 @@
 #include "Genetic/Genetic.hpp"
-using std::cout;
-using std::endl;
 
 GeneticAlgo::GeneticAlgo() :
     gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())),
     randn(std::normal_distribution<double>(0.0, 1.0)),
     rand(std::uniform_real_distribution<double>(0.0, 1.0)),
-    games(std::vector<Individual>(500)) {
-    generations = 100;
-    popsize = 500;
+    games(std::vector<Individual>(Config::POPSIZE)) {
+    generations = Config::GENERATIONS;
+    popsize = Config::POPSIZE;
     newpopsize = Config::NEW_POPSIZE;
     eta = Config::SBX_ETA;
     mut_prob = Config::MUTATION_RATE;
@@ -24,8 +22,12 @@ void GeneticAlgo::start() {
         crossoverAndMutation();
     }
     playgames();
-    for (Individual &g : games)
-        std::cout << g.fitness << "| " << g.snake.score << " |" << g.snake.steps << "\n";
+    for (int i = 0; i < 10; i++) {
+        Render rend(games[0].snake.net.weights, games[0].snake.net.biases);
+        rend.start();
+    }
+    // for (Individual &g : games)
+    //     std::cout << g.fitness << "| " << g.snake.score << " |" << g.snake.steps << "\n";
 }
 
 // Simulate the population playing games
@@ -52,9 +54,6 @@ std::vector<Individual> GeneticAlgo::selection() {
             current += game.fitness;
             if (current >= pick) {
                 selection.push_back(game);
-                if (currGen == 100) {
-                    std::cout << selection[i].fitness << std::endl;
-                }
                 break;
             }
         }

@@ -1,4 +1,4 @@
-#include "Individual.hpp"
+#include "Genetic/Individual.hpp"
 
 Individual::Individual() :
     Game() {

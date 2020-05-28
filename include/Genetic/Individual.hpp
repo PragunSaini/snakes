@@ -1,14 +1,7 @@
 #ifndef INDIVIDUAL_HPP
 #define INDIVIDUAL_HPP
 
-#include "Config.hpp"
-#include "Food.hpp"
 #include "Game.hpp"
-#include "Map.hpp"
-#include "Random.hpp"
-#include "Snake.hpp"
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
 #include <iostream>
 #include <vector>
 

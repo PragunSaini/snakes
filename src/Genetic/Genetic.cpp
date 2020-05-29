@@ -15,17 +15,19 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> GeneticAlgo::simulatedBinaryCrossove
     int m = w1.rows();
     int n = w1.cols();
 
-    Eigen::MatrixXd gamma = Eigen::MatrixXd(m, n);
-    Eigen::MatrixXd rand = Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
-    gamma = (rand.array() <= 0.5).select((2 * rand).array().pow(1.0 / (etaX + 1.0)), gamma);
-    gamma = (rand.array() > 0.5).select((1.0 / (2.0 * (1.0 - rand.array()))).array().pow(etaX + 1.0), gamma);
+    // Eigen::MatrixXd gamma = Eigen::MatrixXd(m, n);
 
-    Eigen::MatrixXd child1 = Eigen::MatrixXd(m, n);
-    Eigen::MatrixXd child2 = Eigen::MatrixXd(m, n);
+    Eigen::MatrixXd rand = Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
+    Eigen::MatrixXd gamma = (rand.array() <= 0.5).select((2 * rand).array().pow(1.0 / (etaX + 1.0)), (1.0 / (2.0 * (1.0 - rand.array()))).array().pow(1.0 / (etaX + 1.0)));
+
+    // gamma = (rand.array() > 0.5).select((1.0 / (2.0 * (1.0 - rand.array()))).array().pow(etaX + 1.0), gamma);
+    // Eigen::MatrixXd child1 = Eigen::MatrixXd(m, n);
+    // Eigen::MatrixXd child2 = Eigen::MatrixXd(m, n);
+
     Eigen::MatrixXd oneMinusGamma = 1 - gamma.array();
     Eigen::MatrixXd onePlusGamma = 1 + gamma.array();
-    child1 = 0.5 * (onePlusGamma.cwiseProduct(w1) + oneMinusGamma.cwiseProduct(w2));
-    child1 = 0.5 * (oneMinusGamma.cwiseProduct(w1) + onePlusGamma.cwiseProduct(w2));
+    Eigen::MatrixXd child1 = 0.5 * (onePlusGamma.cwiseProduct(w1) + oneMinusGamma.cwiseProduct(w2));
+    Eigen::MatrixXd child2 = 0.5 * (oneMinusGamma.cwiseProduct(w1) + onePlusGamma.cwiseProduct(w2));
 
     return {child1, child2};
 }
@@ -33,17 +35,18 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> GeneticAlgo::simulatedBinaryCrossove
 std::pair<Eigen::VectorXd, Eigen::VectorXd> GeneticAlgo::simulatedBinaryCrossover(const Eigen::VectorXd &b1, const Eigen::VectorXd &b2) {
     int m = b1.size();
 
-    Eigen::VectorXd gamma = Eigen::VectorXd(m);
+    // Eigen::VectorXd gamma = Eigen::VectorXd(m);
     Eigen::MatrixXd rand = Eigen::VectorXd(m).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
-    gamma = (rand.array() <= 0.5).select((2 * rand).array().pow(1.0 / (etaX + 1.0)), gamma);
-    gamma = (rand.array() > 0.5).select((1.0 / (2.0 * (1.0 - rand.array()))).array().pow(etaX + 1.0), gamma);
+    Eigen::VectorXd gamma = (rand.array() <= 0.5).select((2 * rand).array().pow(1.0 / (etaX + 1.0)), (1.0 / (2.0 * (1.0 - rand.array()))).array().pow(1.0 / (etaX + 1.0)));
 
-    Eigen::VectorXd child1 = Eigen::VectorXd(m);
-    Eigen::VectorXd child2 = Eigen::VectorXd(m);
+    // gamma = (rand.array() > 0.5).select((1.0 / (2.0 * (1.0 - rand.array()))).array().pow(etaX + 1.0), gamma);
+    // Eigen::VectorXd child1 = Eigen::VectorXd(m);
+    // Eigen::VectorXd child2 = Eigen::VectorXd(m);
+
     Eigen::VectorXd oneMinusGamma = 1 - gamma.array();
     Eigen::VectorXd onePlusGamma = 1 + gamma.array();
-    child1 = 0.5 * (onePlusGamma.cwiseProduct(b1) + oneMinusGamma.cwiseProduct(b2));
-    child2 = 0.5 * (oneMinusGamma.cwiseProduct(b1) + onePlusGamma.cwiseProduct(b2));
+    Eigen::VectorXd child1 = 0.5 * (onePlusGamma.cwiseProduct(b1) + oneMinusGamma.cwiseProduct(b2));
+    Eigen::VectorXd child2 = 0.5 * (oneMinusGamma.cwiseProduct(b1) + onePlusGamma.cwiseProduct(b2));
 
     return {child1, child2};
 }
@@ -51,10 +54,10 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> GeneticAlgo::simulatedBinaryCrossove
 void GeneticAlgo::gaussianMutation(Eigen::MatrixXd &w) {
     int m = w.rows();
     int n = w.cols();
+
     Eigen::MatrixXd rand = Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
     Eigen::MatrixXd mutations = Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return GeneticUtils::randn(GeneticUtils::gen); }) + w;
     w = (rand.array() < mutationProb).select(mutations, w);
-
     // for (int i = 0; i < m; i++) {
     //     for (int j = 0; j < n; j++) {
     //         double prob = rand(gen);
@@ -66,7 +69,9 @@ void GeneticAlgo::gaussianMutation(Eigen::MatrixXd &w) {
 }
 
 void GeneticAlgo::gaussianMutation(Eigen::VectorXd &b) {
+
     int m = b.rows();
+
     Eigen::VectorXd rand = Eigen::VectorXd(m).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
     Eigen::VectorXd mutations = Eigen::VectorXd(m).unaryExpr([&](double dummy) { return GeneticUtils::randn(GeneticUtils::gen); }) + b;
     b = (rand.array() < mutationProb).select(mutations, b);

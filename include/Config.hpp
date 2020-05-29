@@ -20,7 +20,7 @@ namespace Config {
 
     const int POPSIZE = 500;
     const int NEW_POPSIZE = 1000;
-    const int GENERATIONS = 2000;
+    const int GENERATIONS = 1000;
     const double SBX_ETA = 100;
     const double MUTATION_RATE = 0.05;
 } // namespace Config

@@ -6,12 +6,13 @@
 #include "Map.hpp"
 #include "Random.hpp"
 #include "Snake.hpp"
+#include <Eigen/Dense>
 #include <iostream>
 #include <vector>
 
 class Game {
 protected:
-    void init(const std::vector<NeuralNet::VecWeights> &w = {}, const std::vector<NeuralNet::VecBiases> &b = {});
+    void init(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
 
 public:
     std::vector<std::vector<int>> grid;
@@ -20,7 +21,7 @@ public:
     Random rand;
 
     Game();
-    Game(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b);
+    Game(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
     Game(const Game &);
     Game &operator=(const Game &);
     virtual void start() = 0;

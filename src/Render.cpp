@@ -13,7 +13,7 @@ Render::Render() :
     snakeSpeed = sf::seconds(1.0 / Config::SNAKESPEED);
 }
 
-Render::Render(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b) :
+Render::Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     Game(w, b) {
     window.create(sf::VideoMode(Config::WIDTH, Config::HEIGHT), "Snakes");
     if (Config::FRAMERATE > 0) {

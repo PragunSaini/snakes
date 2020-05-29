@@ -3,30 +3,31 @@
 
 #include "Genetic/Individual.hpp"
 #include "Render.hpp"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <iostream>
 #include <random>
 #include <utility>
 #include <vector>
 
+namespace GeneticUtils {
+    extern std::mt19937 gen;
+    extern std::normal_distribution<double> randn;
+    extern std::uniform_real_distribution<double> rand;
+}; // namespace GeneticUtils
+
 class GeneticAlgo {
 private:
-    typedef std::vector<double> VecBiases;
-    typedef std::vector<std::vector<double>> VecWeights;
-
-    static std::mt19937 gen;
-    static std::normal_distribution<double> randn;
-    static std::uniform_real_distribution<double> rand;
     static int generations;
     static int popSize;
     static int offSpringSize;
     static double etaX;
     static double mutationProb;
 
-    static std::pair<VecWeights, VecWeights> simulatedBinaryCrossover(const VecWeights &, const VecWeights &);
-    static std::pair<VecBiases, VecBiases> simulatedBinaryCrossover(const VecBiases &, const VecBiases &);
-    static void gaussianMutation(VecWeights &);
-    static void gaussianMutation(VecBiases &);
+    static std::pair<Eigen::MatrixXd, Eigen::MatrixXd> simulatedBinaryCrossover(const Eigen::MatrixXd &, const Eigen::MatrixXd &);
+    static std::pair<Eigen::VectorXd, Eigen::VectorXd> simulatedBinaryCrossover(const Eigen::VectorXd &, const Eigen::VectorXd &);
+    static void gaussianMutation(Eigen::MatrixXd &);
+    static void gaussianMutation(Eigen::VectorXd &);
 
     int currGen;
     std::vector<Individual> population;

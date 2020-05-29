@@ -3,6 +3,7 @@
 
 #include "Config.hpp"
 #include "NN/NeuralNet.hpp"
+#include <Eigen/Dense>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <utility>
@@ -30,7 +31,7 @@ class Snake {
     void increaseLength();
     bool inRange(int, int);
     std::vector<double> objectEncoder(int);
-    std::vector<double> getVision();
+    Eigen::VectorXd getVision();
     void calculateFitness();
     void initFields();
     void die();
@@ -49,7 +50,7 @@ public:
     double fitness;
 
     Snake(Game *, int = 1);
-    void init(const std::vector<NeuralNet::VecWeights> &w = {}, const std::vector<NeuralNet::VecBiases> &b = {});
+    void init(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
     // void move(sf::Keyboard::Key); // for keyboard movement
     void update();
 };

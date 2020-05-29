@@ -20,7 +20,7 @@ std::vector<std::pair<int, int>> Snake::visionDirs = {
 };
 
 Snake::Snake(Game *game, int color) :
-    game(game), color(color), alive(true) {
+    game(game), changedir(Direction::SAME), color(color), alive(true) {
 }
 
 void Snake::initFields() {
@@ -56,14 +56,14 @@ void Snake::initFields() {
     stepsSinceFood = 0;
 }
 
-void Snake::init(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b) {
+void Snake::init(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) {
     initFields();
     // Default initalize NN weights or from params
-    if (!w.empty() && !b.empty()) {
-        net = NeuralNet(Config::LAYERS, w, b);
+    if (w.size() == 0 && b.size() == 0) {
+        net = NeuralNet(Config::LAYERS);
     }
     else {
-        net = NeuralNet(Config::LAYERS);
+        net = NeuralNet(Config::LAYERS, w, b);
     }
 }
 
@@ -78,9 +78,49 @@ void Snake::moveBody() {
     }
 }
 
+// Update snakes position (aka move snake)
+void Snake::update() {
+    if (alive) {
+        stepsSinceFood++;
+
+        // Move snake
+        moveBody();
+        moveHead();
+        steps++;
+
+        // Check if out of grid or eating a snake
+        if (!inRange(snake[0].x, snake[0].y) || (game->grid[snake[0].y][snake[0].x] > 0 && game->grid[snake[0].y][snake[0].x] < 10)) {
+            die();
+        }
+        // Check if eating food
+        else if (game->grid[snake[0].y][snake[0].x] == -1) {
+            stepsSinceFood = 0;
+            increaseLength();
+            score++;
+            game->foodManager.regenerate();
+            game->grid[snake[0].y][snake[0].x] = color;
+        }
+        else {
+            game->grid[snake[0].y][snake[0].x] = color;
+        }
+
+        // If snake takes too long to eat, it dies
+        if (stepsSinceFood >= Config::COLS * Config::ROWS) {
+            die();
+        }
+    }
+}
+
 // Move snakes head
 void Snake::moveHead() {
     Direction &dir = snake[0].dir;
+
+    // Find direction to move in using NN
+    Eigen::VectorXd res = net.feedforward(getVision());
+    int dist;
+    res.maxCoeff(&dist);
+    changedir = (Direction)dist;
+
     switch (changedir) {
     case Direction::UP:
         if (dir != Direction::DOWN) {
@@ -147,44 +187,6 @@ bool Snake::inRange(int x, int y) {
     return false;
 }
 
-// Update snakes position (aka move snake)
-void Snake::update() {
-    if (alive) {
-        stepsSinceFood++;
-
-        // Find direction to move in using NN
-        std::vector<double> res = net.feedforward(getVision());
-        int dist = std::distance(res.begin(), std::max_element(res.begin(), res.end()));
-        changedir = (Direction)dist;
-
-        // Move snake
-        moveBody();
-        moveHead();
-        steps++;
-
-        // Check if out of grid or eating a snake
-        if (!inRange(snake[0].x, snake[0].y) || (game->grid[snake[0].y][snake[0].x] > 0 && game->grid[snake[0].y][snake[0].x] < 10)) {
-            die();
-        }
-        // Check if eating food
-        else if (game->grid[snake[0].y][snake[0].x] == -1) {
-            stepsSinceFood = 0;
-            increaseLength();
-            score++;
-            game->foodManager.regenerate();
-            game->grid[snake[0].y][snake[0].x] = color;
-        }
-        else {
-            game->grid[snake[0].y][snake[0].x] = color;
-        }
-
-        // If snake takes too long to eat, it dies
-        if (stepsSinceFood >= Config::COLS * Config::ROWS) {
-            die();
-        }
-    }
-}
-
 void Snake::die() {
     alive = false;
     color = 10 + color;
@@ -227,7 +229,7 @@ std::vector<double> Snake::objectEncoder(int x) {
 // Get a one hot encoded boolean array of snakes vision
 // Looks in 8 directions clockwise and reports first thing it sees
 // Also encodes directions of head and tail
-std::vector<double> Snake::getVision() {
+Eigen::VectorXd Snake::getVision() {
     std::vector<double> res;
     res.reserve(32);
 
@@ -259,7 +261,8 @@ std::vector<double> Snake::getVision() {
     std::vector<double> tailDir(4, 0);
     tailDir[(int)snake[length - 1].dir] = 1;
     res.insert(res.end(), tailDir.begin(), tailDir.end());
-    return res;
+
+    return Eigen::VectorXd::Map(res.data(), res.size());
 }
 
 // For keyboard movement

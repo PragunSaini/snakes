@@ -7,13 +7,13 @@
 
 class Individual : public Game {
 private:
-    // void init(const std::vector<NeuralNet::VecWeights> &w = {}, const std::vector<NeuralNet::VecBiases> &b = {});
+    // void init(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
 
 public:
     double fitness;
 
     Individual();
-    Individual(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b);
+    Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
     Individual(const Individual &);
     Individual &operator=(const Individual &);
     bool operator>(const Individual &) const;

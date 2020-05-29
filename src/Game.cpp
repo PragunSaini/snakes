@@ -1,13 +1,8 @@
 #include "Game.hpp"
 
-void Game::init(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b) {
+void Game::init(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) {
     grid = std::vector<std::vector<int>>(Config::ROWS, std::vector<int>(Config::COLS, 0));
-    if (!w.empty() && !b.empty()) {
-        snake.init(w, b);
-    }
-    else {
-        snake.init();
-    }
+    snake.init(w, b);
     foodManager.init();
 }
 
@@ -16,7 +11,7 @@ Game::Game() :
     init();
 }
 
-Game::Game(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b) :
+Game::Game(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     foodManager(this),
     snake(this) {
     init(w, b);

@@ -19,7 +19,7 @@ private:
 
 public:
     Render();
-    Render(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b);
+    Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
     Render(const Render &);
     void start();
 };

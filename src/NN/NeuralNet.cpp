@@ -1,40 +1,27 @@
 #include "NN/NeuralNet.hpp"
+#include <iostream>
 
-double ActivationFuncs::relu(double z) {
+std::mt19937 NN::gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+std::uniform_real_distribution<double> NN::rand = std::uniform_real_distribution<double>(0.0, 1.0);
+std::normal_distribution<double> NN::randn = std::normal_distribution<double>(0.0, 1.0);
+
+double NN::relu(double z) {
     return std::max(0.0, z);
 }
 
-double ActivationFuncs::sigmoid(double z) {
+double NN::sigmoid(double z) {
     return 1.0 / (1.0 + std::exp(-z));
 }
 
-RandomHelper::RandomHelper() :
-    gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())),
-    randn(std::normal_distribution<double>(0.0, 1.0)),
-    rand(std::uniform_real_distribution<double>(0, 1)) {}
-
 // Returns biases for a layer of size m
-std::vector<double> RandomHelper::getBias(int m) {
-    std::vector<double> biases(m);
-    for (int i = 0; i < m; i++) {
-        biases[i] = randn(gen);
-        // biases[i] = rand(gen);
-    }
-    return biases;
+Eigen::VectorXd NN::getBias(int m) {
+    return Eigen::VectorXd(m).unaryExpr([&](double dummy) { return NN::randn(NN::gen); });
 }
 
 // Returns weights for layer n to m
-std::vector<std::vector<double>> RandomHelper::getWeight(int m, int n) {
-    std::vector<std::vector<double>> weights(m, std::vector<double>(n));
+Eigen::MatrixXd NN::getWeight(int m, int n) {
     double div = std::sqrt(n);
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            // weights[i][j] = randn(gen) / div;
-            weights[i][j] = randn(gen);
-            // weights[i][j] = rand(gen);
-        }
-    }
-    return weights;
+    return Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return NN::randn(NN::gen) / div; });
 }
 
 NeuralNet::NeuralNet() {}
@@ -42,16 +29,16 @@ NeuralNet::NeuralNet() {}
 NeuralNet::NeuralNet(const std::vector<int> &sizes) :
     sizes(sizes),
     layers(sizes.size()) {
-    actFuncs.resize(layers - 1, ActivationFuncs::sigmoid);
-    actFuncs[layers - 2] = ActivationFuncs::relu;
+    actFuncs.resize(layers - 1, NN::sigmoid);
+    actFuncs[layers - 2] = NN::relu;
     weightInitializer();
 }
 
-NeuralNet::NeuralNet(const std::vector<int> &sizes, const std::vector<VecWeights> &w, const std::vector<VecBiases> &b) :
+NeuralNet::NeuralNet(const std::vector<int> &sizes, const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     sizes(sizes),
     layers(sizes.size()) {
-    actFuncs.resize(layers - 1, ActivationFuncs::sigmoid);
-    actFuncs[layers - 2] = ActivationFuncs::relu;
+    actFuncs.resize(layers - 1, NN::sigmoid);
+    actFuncs[layers - 2] = NN::relu;
     weights = w;
     biases = b;
 }
@@ -59,52 +46,29 @@ NeuralNet::NeuralNet(const std::vector<int> &sizes, const std::vector<VecWeights
 void NeuralNet::weightInitializer() {
     biases.resize(layers - 1);
     for (int i = 1; i < layers; i++) {
-        biases[i - 1] = random.getBias(sizes[i]);
+        biases[i - 1] = NN::getBias(sizes[i]);
     }
 
     weights.resize(layers - 1);
     for (int i = 1; i < layers; i++) {
-        weights[i - 1] = random.getWeight(sizes[i], sizes[i - 1]);
+        weights[i - 1] = NN::getWeight(sizes[i], sizes[i - 1]);
     }
 }
 
-std::vector<double> NeuralNet::dot(const VecWeights &w, const std::vector<double> &inputs) {
-    int m = w.size();
-    int n = w[0].size();
-    std::vector<double> res(m);
-    for (int i = 0; i < m; i++) {
-        double sum = 0;
-        for (int j = 0; j < n; j++) {
-            sum += w[i][j] * inputs[j];
-        }
-        res[i] = sum;
+Eigen::VectorXd NeuralNet::activate(const Eigen::VectorXd &inputs, int l) {
+    if (l == -1) {
+        return 1.0 / (1.0 + (inputs * -1).array().exp());
     }
-    return res;
-}
-
-std::vector<double> NeuralNet::add(const std::vector<double> &inputs, const VecBiases &b) {
-    int m = b.size();
-    std::vector<double> res(m);
-    for (int i = 0; i < m; i++) {
-        res[i] = inputs[i] + b[i];
+    else {
+        return inputs.unaryExpr(actFuncs[l]);
     }
-    return res;
-}
-
-std::vector<double> NeuralNet::activate(const std::vector<double> &inputs, int layer) {
-    double (*actFunc)(double) = layer == -1 ? ActivationFuncs::sigmoid : actFuncs[layer];
-    int m = inputs.size();
-    std::vector<double> res(m);
-    for (int i = 0; i < m; i++) {
-        res[i] = actFunc(inputs[i]);
-    }
-    return res;
 }
 
 // Feedforward the inputs to get outputs
-std::vector<double> NeuralNet::feedforward(std::vector<double> inputs) {
+// WAT THE FAK IS HAPPENING
+Eigen::VectorXd NeuralNet::feedforward(Eigen::VectorXd inputs) {
     for (int i = 0; i < layers - 1; i++) {
-        inputs = activate(add(dot(weights[i], inputs), biases[i]), i);
+        inputs = activate((weights[i] * inputs) + biases[i]);
     }
     return inputs;
 }

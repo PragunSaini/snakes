@@ -6,7 +6,7 @@ Individual::Individual() :
     fitness = 0.0;
 }
 
-Individual::Individual(const std::vector<NeuralNet::VecWeights> &w, const std::vector<NeuralNet::VecBiases> &b) :
+Individual::Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     Game(w, b) {
     // init(w, b);
     fitness = 0.0;

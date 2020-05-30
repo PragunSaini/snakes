@@ -115,16 +115,16 @@ GeneticAlgo::GeneticAlgo() :
 }
 
 void GeneticAlgo::start() {
-	globalBest.fitness = 0;
-	// offsprings = population;
-    while (++currGen < generations) {
-    	// if (currGen % 500 == 0) mutationProb *= 0;
+    globalBest.fitness = 0;
+    // offsprings = population;
+    while (++currGen < 5) {
+        // if (currGen % 500 == 0) mutationProb *= 0;
         // First let the current population calculate fitness
-        calculateFitness(offsprings);
+        calculateFitness();
         // Then perform selection of parents
         elitismSelection();
         if (globalBest.fitness < population[0].fitness) {
-        	globalBest = population[0];
+            globalBest = population[0];
         }
 
         std::cout << "Generation : " << currGen << "\n";
@@ -150,15 +150,16 @@ void GeneticAlgo::start() {
         // }
     }
 
-    std::cout << globalBest.fitness << std::endl;
-    for (int i = 0; i < 5; i++) {
-        Render rend(globalBest.snake.net.weights, globalBest.snake.net.biases);
-        rend.start();
-    }
+    globalBest.snake.net.saveToFile(0);
+    // std::cout << globalBest.fitness << std::endl;
+    // for (int i = 0; i < 5; i++) {
+    //     Render rend(globalBest.snake.net.weights, globalBest.snake.net.biases);
+    //     rend.start();
+    // }
 }
 
 // Simulate the population playing games
-void GeneticAlgo::calculateFitness(std::vector<Individual> &population) {
+void GeneticAlgo::calculateFitness() {
     for (Individual &indiv : offsprings) {
         indiv.start();
     }
@@ -168,8 +169,8 @@ void GeneticAlgo::calculateFitness(std::vector<Individual> &population) {
 void GeneticAlgo::elitismSelection() {
     population.clear();
     population.reserve(popSize);
-    for(int i = 0; i < popSize; i++) {
-		population.push_back(Individual(offsprings[i])); 
+    for (int i = 0; i < popSize; i++) {
+        population.push_back(Individual(offsprings[i]));
     }
 }
 
@@ -177,7 +178,7 @@ void GeneticAlgo::elitismSelection() {
 void GeneticAlgo::crossoverAndMutation(double totalFit) {
     // Individual &parent1;
     // Individual &parent2;
-    int par1, par2;
+    int par1 = 0, par2 = 0;
 
     std::uniform_real_distribution<double> dist(0, totalFit);
     for (int i = 0; i < 2; i++) {
@@ -209,7 +210,7 @@ void GeneticAlgo::crossoverAndMutation(double totalFit) {
     std::vector<Eigen::VectorXd> offBiases2;
 
     for (int i = 0; i < l; i++) {
-    	double SBXOrSPC = GeneticUtils::rand(GeneticUtils::gen);
+        double SBXOrSPC = GeneticUtils::rand(GeneticUtils::gen);
         std::pair<Eigen::MatrixXd, Eigen::MatrixXd> w = SBXOrSPC <= 0.5 ? simulatedBinaryCrossover(weights1[i], weights2[i]) : singlePointCrossover(weights1[i], weights2[i]);
         std::pair<Eigen::VectorXd, Eigen::VectorXd> b = SBXOrSPC <= 0.5 ? simulatedBinaryCrossover(biases1[i], biases2[i]) : singlePointCrossover(biases1[i], biases2[i]);
         gaussianMutation(w.first);
@@ -235,7 +236,9 @@ void GeneticAlgo::nextGeneration() {
         totFitness += indiv.fitness;
     }
 
-    while (offsprings.size() < offSpringSize) {
+    int k = offsprings.size();
+    while (k < offSpringSize) {
+        k += 2;
         crossoverAndMutation(totFitness);
     }
 

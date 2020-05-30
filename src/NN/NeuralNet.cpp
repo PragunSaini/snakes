@@ -67,10 +67,17 @@ Eigen::VectorXd NeuralNet::activate(const Eigen::VectorXd &inputs, int l) {
 }
 
 // Feedforward the inputs to get outputs
-// WAT THE FAK IS HAPPENING
 Eigen::VectorXd NeuralNet::feedforward(Eigen::VectorXd inputs) {
     for (int i = 0; i < layers - 1; i++) {
         inputs = activate((weights[i] * inputs) + biases[i], i);
     }
     return inputs;
+}
+
+void NeuralNet::saveToFile(int fileOffset) {
+    std::ofstream ofs("saves/NN" + std::to_string(fileOffset) + ".net");
+    for(int i = 0; i < layers - 1; i++) {
+        ofs << weights[i] << std::endl;
+        ofs << biases[i] << std::endl;
+    }
 }

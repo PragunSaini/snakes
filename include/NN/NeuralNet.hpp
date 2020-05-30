@@ -6,6 +6,7 @@
 #include <cmath>
 #include <random>
 #include <vector>
+#include <fstream>
 
 // Activation Functions
 namespace NN {
@@ -40,6 +41,7 @@ public:
     NeuralNet(const std::vector<int> &);
     NeuralNet(const std::vector<int> &, const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
     Eigen::VectorXd feedforward(Eigen::VectorXd);
+    void saveToFile(int fileOffset=0);
 };
 
 #endif

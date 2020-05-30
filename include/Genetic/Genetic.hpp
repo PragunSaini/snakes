@@ -39,7 +39,7 @@ private:
 public:
     GeneticAlgo();
     void start();
-    void calculateFitness(std::vector<Individual> &);
+    void calculateFitness();
     void elitismSelection();
     void crossoverAndMutation(double totalFit);
     void nextGeneration();

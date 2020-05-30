@@ -26,21 +26,24 @@ private:
 
     static std::pair<Eigen::MatrixXd, Eigen::MatrixXd> simulatedBinaryCrossover(const Eigen::MatrixXd &, const Eigen::MatrixXd &);
     static std::pair<Eigen::VectorXd, Eigen::VectorXd> simulatedBinaryCrossover(const Eigen::VectorXd &, const Eigen::VectorXd &);
+    static std::pair<Eigen::MatrixXd, Eigen::MatrixXd> singlePointCrossover(const Eigen::MatrixXd &, const Eigen::MatrixXd &);
+    static std::pair<Eigen::VectorXd, Eigen::VectorXd> singlePointCrossover(const Eigen::VectorXd &, const Eigen::VectorXd &);
     static void gaussianMutation(Eigen::MatrixXd &);
     static void gaussianMutation(Eigen::VectorXd &);
 
     int currGen;
     std::vector<Individual> population;
     std::vector<Individual> offsprings;
+    Individual globalBest;
 
 public:
     GeneticAlgo();
     void start();
     void calculateFitness(std::vector<Individual> &);
-    void parentSelection();
-    void crossoverAndMutation();
-    void populationSelection();
-    std::vector<Individual> selection();
+    void elitismSelection();
+    void crossoverAndMutation(double totalFit);
+    void nextGeneration();
+    // std::vector<Individual> selection();
 };
 
 #endif

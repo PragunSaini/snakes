@@ -17,7 +17,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> GeneticAlgo::simulatedBinaryCrossove
 
     // Eigen::MatrixXd gamma = Eigen::MatrixXd(m, n);
 
-    Eigen::MatrixXd rand = Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
+    Eigen::MatrixXd rand = Eigen::MatrixXd(m, n).unaryExpr([&](__attribute__((unused)) double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
     Eigen::MatrixXd gamma = (rand.array() <= 0.5).select((2 * rand).array().pow(1.0 / (etaX + 1.0)), (1.0 / (2.0 * (1.0 - rand.array()))).array().pow(1.0 / (etaX + 1.0)));
 
     // gamma = (rand.array() > 0.5).select((1.0 / (2.0 * (1.0 - rand.array()))).array().pow(etaX + 1.0), gamma);
@@ -36,7 +36,7 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> GeneticAlgo::simulatedBinaryCrossove
     int m = b1.size();
 
     // Eigen::VectorXd gamma = Eigen::VectorXd(m);
-    Eigen::MatrixXd rand = Eigen::VectorXd(m).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
+    Eigen::MatrixXd rand = Eigen::VectorXd(m).unaryExpr([&](__attribute__((unused)) double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
     Eigen::VectorXd gamma = (rand.array() <= 0.5).select((2 * rand).array().pow(1.0 / (etaX + 1.0)), (1.0 / (2.0 * (1.0 - rand.array()))).array().pow(1.0 / (etaX + 1.0)));
 
     // gamma = (rand.array() > 0.5).select((1.0 / (2.0 * (1.0 - rand.array()))).array().pow(etaX + 1.0), gamma);
@@ -51,12 +51,34 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> GeneticAlgo::simulatedBinaryCrossove
     return {child1, child2};
 }
 
+std::pair<Eigen::MatrixXd, Eigen::MatrixXd> GeneticAlgo::singlePointCrossover(const Eigen::MatrixXd &w1, const Eigen::MatrixXd &w2) {
+    int rows = w1.rows();
+    int cols = w1.cols();
+    int r = std::uniform_int_distribution<int>(0, rows - 1)(GeneticUtils::gen);
+    int c = std::uniform_int_distribution<int>(0, cols - 1)(GeneticUtils::gen);
+
+    Eigen::MatrixXd child1 = w1;
+    Eigen::MatrixXd child2 = w2;
+    child1.topRows(r + 1).swap(child2.topRows(r + 1));
+    child1.block(r, c, 1, cols - c).swap(child2.block(r, c, 1, cols - c));
+    return {child1, child2};
+}
+
+std::pair<Eigen::VectorXd, Eigen::VectorXd> GeneticAlgo::singlePointCrossover(const Eigen::VectorXd &b1, const Eigen::VectorXd &b2) {
+    int rows = b1.rows();
+    int r = std::uniform_int_distribution<int>(0, rows - 1)(GeneticUtils::gen);
+    Eigen::VectorXd child1 = b1;
+    Eigen::VectorXd child2 = b2;
+    child1.topRows(r + 1).swap(child2.topRows(r + 1));
+    return {child1, child2};
+}
+
 void GeneticAlgo::gaussianMutation(Eigen::MatrixXd &w) {
     int m = w.rows();
     int n = w.cols();
 
-    Eigen::MatrixXd rand = Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
-    Eigen::MatrixXd mutations = Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return GeneticUtils::randn(GeneticUtils::gen); }) + w;
+    Eigen::MatrixXd rand = Eigen::MatrixXd(m, n).unaryExpr([&](__attribute__((unused)) double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
+    Eigen::MatrixXd mutations = Eigen::MatrixXd(m, n).unaryExpr([&](__attribute__((unused)) double dummy) { return GeneticUtils::randn(GeneticUtils::gen); }) + w;
     w = (rand.array() < mutationProb).select(mutations, w);
     // for (int i = 0; i < m; i++) {
     //     for (int j = 0; j < n; j++) {
@@ -72,8 +94,8 @@ void GeneticAlgo::gaussianMutation(Eigen::VectorXd &b) {
 
     int m = b.rows();
 
-    Eigen::VectorXd rand = Eigen::VectorXd(m).unaryExpr([&](double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
-    Eigen::VectorXd mutations = Eigen::VectorXd(m).unaryExpr([&](double dummy) { return GeneticUtils::randn(GeneticUtils::gen); }) + b;
+    Eigen::VectorXd rand = Eigen::VectorXd(m).unaryExpr([&](__attribute__((unused)) double dummy) { return GeneticUtils::rand(GeneticUtils::gen); });
+    Eigen::VectorXd mutations = Eigen::VectorXd(m).unaryExpr([&](__attribute__((unused)) double dummy) { return GeneticUtils::randn(GeneticUtils::gen); }) + b;
     b = (rand.array() < mutationProb).select(mutations, b);
 
     // int m = b.size();
@@ -88,27 +110,36 @@ void GeneticAlgo::gaussianMutation(Eigen::VectorXd &b) {
 // // NON-STATIC MEMBERS AND FUNCTIONS
 
 GeneticAlgo::GeneticAlgo() :
-    population(std::vector<Individual>(Config::POPSIZE)) {
+    offsprings(std::vector<Individual>(Config::POPSIZE)) {
     currGen = 0;
 }
 
 void GeneticAlgo::start() {
+	globalBest.fitness = 0;
+	// offsprings = population;
     while (++currGen < generations) {
-        std::cout << "Generation : " << currGen << "\n";
+    	// if (currGen % 500 == 0) mutationProb *= 0;
         // First let the current population calculate fitness
-        calculateFitness(population);
-
+        calculateFitness(offsprings);
         // Then perform selection of parents
-        parentSelection();
+        elitismSelection();
+        if (globalBest.fitness < population[0].fitness) {
+        	globalBest = population[0];
+        }
+
+        std::cout << "Generation : " << currGen << "\n";
+        std::cout << "Round Best Fitness : " << population[0].fitness << "\n";
+        std::cout << "Best Fitness : " << globalBest.fitness << "\n";
+        // std::cout << "Best Fitness : " << population[0].fitness << std::endl;
 
         // Generate offsprings using crossover and mutation
-        crossoverAndMutation();
+        // crossoverAndMutation();
 
         // Calculate offsprings fitness
-        calculateFitness(offsprings);
+        // calculateFitness(offsprings);
 
         // Select best for new population
-        populationSelection();
+        nextGeneration();
 
         // if (currGen % 100 == 0) {
         //     std::cout << population[0].fitness << std::endl;
@@ -119,91 +150,109 @@ void GeneticAlgo::start() {
         // }
     }
 
-    std::cout << population[0].fitness << std::endl;
-    for (int i = 0; i < 10; i++) {
-        Render rend(population[i].snake.net.weights, population[i].snake.net.biases);
+    std::cout << globalBest.fitness << std::endl;
+    for (int i = 0; i < 5; i++) {
+        Render rend(globalBest.snake.net.weights, globalBest.snake.net.biases);
         rend.start();
     }
 }
 
 // Simulate the population playing games
 void GeneticAlgo::calculateFitness(std::vector<Individual> &population) {
-    for (Individual &indiv : population) {
+    for (Individual &indiv : offsprings) {
         indiv.start();
     }
-    std::sort(population.begin(), population.end(), std::greater<Individual>());
+    std::sort(offsprings.begin(), offsprings.end(), std::greater<Individual>());
 }
 
-void GeneticAlgo::parentSelection() {
+void GeneticAlgo::elitismSelection() {
+    population.clear();
+    population.reserve(popSize);
+    for(int i = 0; i < popSize; i++) {
+		population.push_back(Individual(offsprings[i])); 
+    }
+}
+
+// Perform crossover and mutation to generate child population
+void GeneticAlgo::crossoverAndMutation(double totalFit) {
+    // Individual &parent1;
+    // Individual &parent2;
+    int par1, par2;
+
+    std::uniform_real_distribution<double> dist(0, totalFit);
+    for (int i = 0; i < 2; i++) {
+        double pick = dist(GeneticUtils::gen);
+        double current = 0;
+        for (int j = 0; j < popSize; j++) {
+            current += population[j].fitness;
+            if (current >= pick) {
+                if (i == 0) {
+                    par1 = j;
+                }
+                else {
+                    par2 = j;
+                }
+                break;
+            }
+        }
+    }
+
+    const std::vector<Eigen::MatrixXd> &weights1 = population[par1].snake.net.weights;
+    const std::vector<Eigen::MatrixXd> &weights2 = population[par2].snake.net.weights;
+    const std::vector<Eigen::VectorXd> &biases1 = population[par1].snake.net.biases;
+    const std::vector<Eigen::VectorXd> &biases2 = population[par2].snake.net.biases;
+    int l = weights1.size();
+
+    std::vector<Eigen::MatrixXd> offWeights1;
+    std::vector<Eigen::MatrixXd> offWeights2;
+    std::vector<Eigen::VectorXd> offBiases1;
+    std::vector<Eigen::VectorXd> offBiases2;
+
+    for (int i = 0; i < l; i++) {
+    	double SBXOrSPC = GeneticUtils::rand(GeneticUtils::gen);
+        std::pair<Eigen::MatrixXd, Eigen::MatrixXd> w = SBXOrSPC <= 0.5 ? simulatedBinaryCrossover(weights1[i], weights2[i]) : singlePointCrossover(weights1[i], weights2[i]);
+        std::pair<Eigen::VectorXd, Eigen::VectorXd> b = SBXOrSPC <= 0.5 ? simulatedBinaryCrossover(biases1[i], biases2[i]) : singlePointCrossover(biases1[i], biases2[i]);
+        gaussianMutation(w.first);
+        gaussianMutation(w.second);
+        gaussianMutation(b.first);
+        gaussianMutation(b.second);
+        offWeights1.push_back(w.first);
+        offWeights2.push_back(w.second);
+        offBiases1.push_back(b.first);
+        offBiases2.push_back(b.second);
+    }
+    offsprings.push_back(Individual(offWeights1, offBiases1));
+    offsprings.push_back(Individual(offWeights2, offBiases2));
+}
+
+void GeneticAlgo::nextGeneration() {
     offsprings.clear();
     offsprings.reserve(offSpringSize);
 
     double totFitness = 0.0;
     for (Individual &indiv : population) {
+        offsprings.push_back(indiv);
         totFitness += indiv.fitness;
     }
 
-    std::uniform_real_distribution<double> dist(0, totFitness);
-    for (int i = 0; i < offSpringSize; i++) {
-        double pick = dist(GeneticUtils::gen);
-        double current = 0;
-        for (Individual &indiv : population) {
-            current += indiv.fitness;
-            if (current >= pick) {
-                offsprings.push_back(indiv);
-                break;
-            }
-        }
+    while (offsprings.size() < offSpringSize) {
+        crossoverAndMutation(totFitness);
     }
-}
 
-// Perform crossover and mutation to generate child population
-void GeneticAlgo::crossoverAndMutation() {
-    for (int i = 0; i < offSpringSize; i += 2) {
-        const std::vector<Eigen::MatrixXd> &weights1 = offsprings[i].snake.net.weights;
-        const std::vector<Eigen::MatrixXd> &weights2 = offsprings[i + 1].snake.net.weights;
-        const std::vector<Eigen::VectorXd> &biases1 = offsprings[i].snake.net.biases;
-        const std::vector<Eigen::VectorXd> &biases2 = offsprings[i + 1].snake.net.biases;
-        int l = weights1.size();
+    // std::vector<Individual> oldPopulation = population;
+    // population.clear();
+    // population.reserve(popSize);
 
-        std::vector<Eigen::MatrixXd> offWeights1;
-        std::vector<Eigen::MatrixXd> offWeights2;
-        std::vector<Eigen::VectorXd> offBiases1;
-        std::vector<Eigen::VectorXd> offBiases2;
-
-        for (int i = 0; i < l; i++) {
-            std::pair<Eigen::MatrixXd, Eigen::MatrixXd> w = simulatedBinaryCrossover(weights1[i], weights2[i]);
-            std::pair<Eigen::VectorXd, Eigen::VectorXd> b = simulatedBinaryCrossover(biases1[i], biases2[i]);
-            gaussianMutation(w.first);
-            gaussianMutation(w.second);
-            gaussianMutation(b.first);
-            gaussianMutation(b.second);
-            offWeights1.push_back(w.first);
-            offWeights2.push_back(w.second);
-            offBiases1.push_back(b.first);
-            offBiases2.push_back(b.second);
-        }
-
-        offsprings[i] = Individual(offWeights1, offBiases1);
-        offsprings[i + 1] = Individual(offWeights2, offBiases2);
-    }
-}
-
-void GeneticAlgo::populationSelection() {
-    std::vector<Individual> oldPopulation = population;
-    population.clear();
-    population.reserve(popSize);
-
-    for (int i = 0, j = 0, k = 0; k < popSize;) {
-        if (oldPopulation[i].fitness > offsprings[j].fitness) {
-            population.push_back(oldPopulation[i]);
-            i++;
-            k++;
-        }
-        else {
-            population.push_back(offsprings[j]);
-            j++;
-            k++;
-        }
-    }
+    // for (int i = 0, j = 0, k = 0; k < popSize;) {
+    //     if (oldPopulation[i].fitness > offsprings[j].fitness) {
+    //         population.push_back(oldPopulation[i]);
+    //         i++;
+    //         k++;
+    //     }
+    //     else {
+    //         population.push_back(offsprings[j]);
+    //         j++;
+    //         k++;
+    //     }
+    // }
 }

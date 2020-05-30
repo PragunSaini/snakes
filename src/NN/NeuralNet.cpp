@@ -15,13 +15,13 @@ double NN::sigmoid(double z) {
 
 // Returns biases for a layer of size m
 Eigen::VectorXd NN::getBias(int m) {
-    return Eigen::VectorXd(m).unaryExpr([&](double dummy) { return NN::randn(NN::gen); });
+    return Eigen::VectorXd(m).unaryExpr([&](__attribute__((unused)) double dummy) { return NN::randn(NN::gen); });
 }
 
 // Returns weights for layer n to m
 Eigen::MatrixXd NN::getWeight(int m, int n) {
     double div = std::sqrt(n);
-    return Eigen::MatrixXd(m, n).unaryExpr([&](double dummy) { return NN::randn(NN::gen) / div; });
+    return Eigen::MatrixXd(m, n).unaryExpr([&](__attribute__((unused)) double dummy) { return NN::randn(NN::gen) / div; });
 }
 
 NeuralNet::NeuralNet() {}
@@ -56,11 +56,13 @@ void NeuralNet::weightInitializer() {
 }
 
 Eigen::VectorXd NeuralNet::activate(const Eigen::VectorXd &inputs, int l) {
-    if (l == -1) {
+    if (l < layers - 2) {
         return 1.0 / (1.0 + (inputs * -1).array().exp());
     }
+    // else if (l == size)
     else {
-        return inputs.unaryExpr(actFuncs[l]);
+        // return inputs.unaryExpr(actFuncs[l]);
+        return inputs.unaryExpr([&](double z){return std::max(0.0, z);});
     }
 }
 
@@ -68,7 +70,7 @@ Eigen::VectorXd NeuralNet::activate(const Eigen::VectorXd &inputs, int l) {
 // WAT THE FAK IS HAPPENING
 Eigen::VectorXd NeuralNet::feedforward(Eigen::VectorXd inputs) {
     for (int i = 0; i < layers - 1; i++) {
-        inputs = activate((weights[i] * inputs) + biases[i]);
+        inputs = activate((weights[i] * inputs) + biases[i], i);
     }
     return inputs;
 }

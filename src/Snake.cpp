@@ -204,6 +204,7 @@ void Snake::calculateFitness() {
               (std::pow(2, score) + std::pow(score, 2.1) * 500) -
               (std::pow(0.25 * steps, 1.3) * std::pow(score, 1.2));
     fitness = std::max(fitness, .1);
+    // fitness = 1.0 + steps;
 
     // fitness = steps + 100 * score - steps * 0.5;
     // fitness = score;

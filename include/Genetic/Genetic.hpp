@@ -34,7 +34,7 @@ private:
     int currGen;
     std::vector<Individual> population;
     std::vector<Individual> offsprings;
-    Individual globalBest;
+    std::vector<Individual> globalBest;
 
 public:
     GeneticAlgo();

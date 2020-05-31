@@ -115,21 +115,27 @@ GeneticAlgo::GeneticAlgo() :
 }
 
 void GeneticAlgo::start() {
-    globalBest.fitness = 0;
+    // globalBest.fitness = 0;
     // offsprings = population;
-    while (++currGen < 5) {
+
+    for (int i = 0; i < 100; i++) {
+        offsprings[i].snake.net.loadFromFile(i%2);
+    }
+
+    while (++currGen < generations) {
         // if (currGen % 500 == 0) mutationProb *= 0;
         // First let the current population calculate fitness
         calculateFitness();
         // Then perform selection of parents
         elitismSelection();
-        if (globalBest.fitness < population[0].fitness) {
-            globalBest = population[0];
+        if (globalBest.empty() || globalBest[0].fitness < population[0].fitness) {
+            globalBest.clear();
+            globalBest.insert(globalBest.end(), population.begin(), population.begin() + 100);
         }
 
         std::cout << "Generation : " << currGen << "\n";
         std::cout << "Round Best Fitness : " << population[0].fitness << "\n";
-        std::cout << "Best Fitness : " << globalBest.fitness << "\n";
+        std::cout << "Best Fitness : " << globalBest[0].fitness << "\n";
         // std::cout << "Best Fitness : " << population[0].fitness << std::endl;
 
         // Generate offsprings using crossover and mutation
@@ -150,12 +156,15 @@ void GeneticAlgo::start() {
         // }
     }
 
-    globalBest.snake.net.saveToFile(0);
-    // std::cout << globalBest.fitness << std::endl;
-    // for (int i = 0; i < 5; i++) {
-    //     Render rend(globalBest.snake.net.weights, globalBest.snake.net.biases);
-    //     rend.start();
-    // }
+    std::cout << globalBest[0].fitness << std::endl;
+    for (int i = 0; i < 100; i++) {
+        std::cout << globalBest[i].fitness << "\n";
+        globalBest[i].snake.net.saveToFile(i);
+        if (i < 10) {
+            Render rend(globalBest[i].snake.net.weights, globalBest[i].snake.net.biases);
+            rend.start();
+        }
+    }
 }
 
 // Simulate the population playing games

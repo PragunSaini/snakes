@@ -62,7 +62,7 @@ Eigen::VectorXd NeuralNet::activate(const Eigen::VectorXd &inputs, int l) {
     // else if (l == size)
     else {
         // return inputs.unaryExpr(actFuncs[l]);
-        return inputs.unaryExpr([&](double z){return std::max(0.0, z);});
+        return inputs.unaryExpr([&](double z) { return std::max(0.0, z); });
     }
 }
 
@@ -76,8 +76,32 @@ Eigen::VectorXd NeuralNet::feedforward(Eigen::VectorXd inputs) {
 
 void NeuralNet::saveToFile(int fileOffset) {
     std::ofstream ofs("saves/NN" + std::to_string(fileOffset) + ".net");
-    for(int i = 0; i < layers - 1; i++) {
+    for (int i = 0; i < layers - 1; i++) {
         ofs << weights[i] << std::endl;
         ofs << biases[i] << std::endl;
+    }
+}
+
+void NeuralNet::loadFromFile(int fileOffset) {
+    std::ifstream ifs("saves/NN" + std::to_string(fileOffset) + ".net");
+    for (int l = 0; l < layers - 1; l++) {
+        // First load weight matrix
+        int r = weights[l].rows();
+        int c = weights[l].cols();
+        std::vector<double> w(c);
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                ifs >> w[j];
+            }
+            weights[l].row(i) = Eigen::VectorXd::Map(w.data(), w.size());
+        }
+
+        // Then load biases
+        r = biases[l].rows();
+        std::vector<double> b(r);
+        for (int i = 0; i < r; i++) {
+            ifs >> b[i];
+        }
+        biases[l] = Eigen::VectorXd::Map(b.data(), b.size());
     }
 }

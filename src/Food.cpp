@@ -10,7 +10,7 @@ FoodManager::FoodManager(Game *game, int foodcount) :
 
 void FoodManager::init() {
     for (int i = 0; i < foodcount; i++) {
-        generateFood(true);
+        generateFood();
     }
 }
 
@@ -19,7 +19,7 @@ void FoodManager::regenerate() {
     generateFood();
 }
 
-void FoodManager::generateFood(bool init) {
+void FoodManager::generateFood() {
     // int x, y;
     // int limit = 0;
     // int timeout = foodcount > 1 ? 100 : 500;
@@ -29,19 +29,12 @@ void FoodManager::generateFood(bool init) {
             if (game->grid[y][x] == 0) empty.push_back({x, y});
         }
     }
+    if (empty.empty()) return;
     std::random_device rand;
     std::mt19937 gen(rand());
     std::uniform_int_distribution<int> dis(0, empty.size()-1);
-    if (init) {
-        for(int i = 0; i < foodcount; i++) {
-            int ind = dis(gen);
-            game->grid[empty[ind].second][empty[ind].first] = -1;
-        }
-    }
-    else {
-        int ind = dis(gen);
-        game->grid[empty[ind].second][empty[ind].first] = -1;
-    }
+    int ind = dis(gen);
+    game->grid[empty[ind].second][empty[ind].first] = -1;
 
     // do {
     //     limit++;

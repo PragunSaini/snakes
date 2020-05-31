@@ -12,7 +12,7 @@ public:
     int foodcount;
 
     FoodManager(Game *, int = Config::FOODCNT);
-    void generateFood(bool = false);
+    void generateFood();
     void init();
     void regenerate();
 };

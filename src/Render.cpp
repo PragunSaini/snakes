@@ -41,7 +41,7 @@ Render::Render(const Render &other) :
 
 void Render::draw() {
     if (snakeUpdate.getElapsedTime() >= snakeSpeed) {
-        snake.update();
+        snake.update(true);
         snakeUpdate.restart();
     }
     window.clear();
@@ -55,7 +55,8 @@ void Render::handleEvents(sf::Event event) {
     case sf::Event::Closed:
         window.close();
         break;
-
+    // case sf::Event::KeyPressed:
+    //     snake.move(event.key.code);
     default:
         break;
     }

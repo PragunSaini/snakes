@@ -6,11 +6,12 @@
 #include <iostream>
 
 int main() {
-    GeneticAlgo gen;
-    gen.start();
-    // Render rend;
-    // rend.snake.net.loadFromFile(0);
-    // rend.start();
+    // GeneticAlgo gen;
+    // gen.start();
+    // std::cout << std::log(0) << std::endl;
+    Render rend;
+    rend.snake.net.loadFromFile(0);
+    rend.start();
     // NeuralNet net({4, 10, 20, 10, 2});
     // Eigen::Vector4d x = Eigen::Vector4d(1, 2, 3, 4);
     // Eigen::VectorXd ans = net.feedforward(x);

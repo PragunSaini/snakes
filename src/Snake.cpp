@@ -1,5 +1,6 @@
 #include "Snake.hpp"
 #include "Game.hpp"
+#include <limits>
 
 Snakebody::Snakebody(int x, int y) :
     x(x), y(y), newblock(true) {}
@@ -16,44 +17,46 @@ std::vector<std::pair<int, int>> Snake::visionDirs = {
     {0, 1},  // DOWN
     {-1, 1}, // DOWN-LEFT,
     {-1, 0}, // LEFT
-    {-1, 1}  // UP-LEFT
+    {-1, -1}  // UP-LEFT
 };
 
 Snake::Snake(Game *game, int color) :
-    game(game), changedir(Direction::SAME), color(color), alive(true) {
-}
+    game(game), changedir(Direction::SAME), color(color), alive(true) {}
 
 void Snake::initFields() {
     int x = game->rand.getX();
     int y = game->rand.getY();
 
     length = 3;
-    snake.push_back(Snakebody(x, y, (Direction)((game->rand.getX() % 2) * 2 + 1)));
+    snake.push_back(Snakebody(x, y, (Direction)(game->rand.getDir())));
+    // snake.push_back(Snakebody(x, y, (Direction)((game->rand.getX() % 2) * 2 + 1)));
     snake[0].newblock = false;
     game->grid[y][x] = color;
 
     if (snake[0].dir == Direction::RIGHT) {
         snake.push_back(Snakebody(x - 1, y, Direction::RIGHT));
-        snake[1].newblock = false;
-        game->grid[snake[1].y][snake[1].x] = color;
-
         snake.push_back(Snakebody(x - 2, y, Direction::RIGHT));
-        snake[2].newblock = false;
-        game->grid[snake[2].y][snake[2].x] = color;
+    }
+    else if (snake[0].dir == Direction::LEFT) {
+        snake.push_back(Snakebody(x + 1, y, Direction::LEFT));
+        snake.push_back(Snakebody(x + 2, y, Direction::LEFT));
+    }
+    else if (snake[0].dir == Direction::UP) {
+        snake.push_back(Snakebody(x, y + 1, Direction::UP));
+        snake.push_back(Snakebody(x, y + 2, Direction::UP));
     }
     else {
-        snake.push_back(Snakebody(x + 1, y, Direction::LEFT));
-        snake[1].newblock = false;
-        game->grid[snake[1].y][snake[1].x] = color;
-
-        snake.push_back(Snakebody(x + 2, y, Direction::RIGHT));
-        snake[2].newblock = false;
-        game->grid[snake[2].y][snake[2].x] = color;
+        snake.push_back(Snakebody(x, y - 1, Direction::DOWN));
+        snake.push_back(Snakebody(x, y - 2, Direction::DOWN));
     }
+    snake[1].newblock = false;
+    game->grid[snake[1].y][snake[1].x] = color;
+    snake[2].newblock = false;
+    game->grid[snake[2].y][snake[2].x] = color;
 
     score = 0;
     steps = 0;
-    stepsSinceFood = 0;
+    stepsSinceFood = Config::ROWS*Config::COLS;
 }
 
 void Snake::init(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) {
@@ -69,9 +72,7 @@ void Snake::init(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen:
 
 // Move snakes body except the head
 void Snake::moveBody() {
-    if (!snake[length - 1].newblock)
-        game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
-
+    // if (!snake[length - 1].newblock)
     for (int i = length - 1; i >= 1; i--) {
         snake[i] = snake[i - 1];
         game->grid[snake[i].y][snake[i].x] = color;
@@ -79,22 +80,37 @@ void Snake::moveBody() {
 }
 
 // Update snakes position (aka move snake)
-void Snake::update() {
+void Snake::update(bool log) {
     if (alive) {
-        stepsSinceFood++;
+        // stepsSinceFood++;
 
-        // Move snake
+        game->grid[snake[length - 1].y][snake[length - 1].x] = 0;
+        // Find direction to move in using NN
+        Eigen::VectorXd res = net.feedforward(getVision());
+        int dist;
+        res.maxCoeff(&dist);
+        changedir = (Direction)dist;
+
+        // // Move snake
         moveBody();
         moveHead();
-        steps++;
+        // steps++;
 
         // Check if out of grid or eating a snake
         if (!inRange(snake[0].x, snake[0].y) || (game->grid[snake[0].y][snake[0].x] > 0 && game->grid[snake[0].y][snake[0].x] < 10)) {
             die();
+            if (log) {
+                if (!inRange(snake[0].x, snake[0].y)) {
+                    std::cout << "DEATH BY OUT OF GRID : " << snake[0].x << "," << snake[0].y << "\n";
+                }
+                else {
+                    std::cout << "DEATH BY SELF EATING : " << snake[0].x << "," << snake[0].y << "\n";
+                }
+            }
         }
         // Check if eating food
         else if (game->grid[snake[0].y][snake[0].x] == -1) {
-            stepsSinceFood = 0;
+            stepsSinceFood = Config::ROWS*Config::COLS;
             increaseLength();
             score++;
             game->foodManager.regenerate();
@@ -105,21 +121,21 @@ void Snake::update() {
         }
 
         // If snake takes too long to eat, it dies
-        if (stepsSinceFood >= Config::COLS * Config::ROWS) {
+        if (stepsSinceFood <= 0) {
+            if (log) {
+                std::cout << "DEATH BY STARVATION" << "\n";
+            }
             die();
         }
+
+        stepsSinceFood--;
+        steps++;
     }
 }
 
 // Move snakes head
 void Snake::moveHead() {
     Direction &dir = snake[0].dir;
-
-    // Find direction to move in using NN
-    Eigen::VectorXd res = net.feedforward(getVision());
-    int dist;
-    res.maxCoeff(&dist);
-    changedir = (Direction)dist;
 
     switch (changedir) {
     case Direction::UP:
@@ -176,7 +192,26 @@ void Snake::moveHead() {
 
 // Add snakebody to snake
 void Snake::increaseLength() {
-    snake.push_back(Snakebody(0, 0, snake[length - 1].dir));
+    switch(snake[length-1].dir) {
+        case Direction::UP:
+            snake.push_back(Snakebody(snake[length-1].x, snake[length-1].y+1, snake[length - 1].dir));
+            snake[length].newblock = false;
+            break;
+        case Direction::DOWN:
+            snake.push_back(Snakebody(snake[length-1].x, snake[length-1].y-1, snake[length - 1].dir));
+            snake[length].newblock = false;
+            break;
+        case Direction::LEFT:
+            snake.push_back(Snakebody(snake[length-1].x+1, snake[length-1].y, snake[length - 1].dir));
+            snake[length].newblock = false;
+            break;
+        case Direction::RIGHT:
+            snake.push_back(Snakebody(snake[length-1].x-1, snake[length-1].y, snake[length - 1].dir));
+            snake[length].newblock = false;
+            break;
+        default:
+            break;
+    }
     length++;
 }
 
@@ -200,16 +235,19 @@ void Snake::die() {
 }
 
 void Snake::calculateFitness() {
-    fitness = steps +
-              (std::pow(2, score) + std::pow(score, 2.1) * 500) -
-              (std::pow(0.25 * steps, 1.3) * std::pow(score, 1.2));
-    fitness = std::max(fitness, .1);
-    // fitness = 1.0 + steps;
-
-    // fitness = steps + 100 * score - steps * 0.5;
-    // fitness = score;
-
-    // fitness = steps + std::pow(2, score);
+    // fitness = steps +
+    //           (std::pow(2, score) + std::pow(score, 2.1) * 500) -
+    //           (std::pow(0.25 * steps, 1.3) * std::pow(score, 1.2));
+    // fitness = std::max(fitness, .1);
+    // fitness = steps*steps*std::pow(10, score);
+    // fitness = (std::pow(2, score) / (2 << 3)) * steps;
+    // else {
+    // fitness = (std::pow(1.5, (double)score)) * (steps/10.0) + std::pow(score, 2);
+    fitness = (std::pow(2.0, (double)score)) * (steps/10);
+    // }
+    // if (fitness < 0) {
+    //     fitness = std::numeric_limits<double>::max();
+    // }
 }
 
 // Utility function to encode an object in vision
@@ -262,8 +300,23 @@ Eigen::VectorXd Snake::getVision() {
     std::vector<double> tailDir(4, 0);
     tailDir[(int)snake[length - 1].dir] = 1;
     res.insert(res.end(), tailDir.begin(), tailDir.end());
-
     return Eigen::VectorXd::Map(res.data(), res.size());
+    // for (int i = 0; i < 32; i++) {
+    //     if (i < 24) {
+    //         if (i % 3 == 2) {
+    //             std::cout << res[i] << " | ";
+    //         }
+    //         else {
+    //             std::cout << res[i] << ", ";
+    //         }
+    //     }
+    //     else {
+    //         std::cout << res[i] << " . ";
+    //     }
+    // }
+    // std::cout << "\n";
+    // std::cout << Eigen::VectorXd::Map(res.data(), res.size()) << "\n";
+    // return haha;
 }
 
 // For keyboard movement

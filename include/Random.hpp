@@ -9,11 +9,13 @@ class Random {
 public:
     std::uniform_int_distribution<int> randX;
     std::uniform_int_distribution<int> randY;
+    std::uniform_int_distribution<int> randDir;
     std::mt19937 gen;
 
     Random();
     int getX();
     int getY();
+    int getDir();
 };
 
 #endif

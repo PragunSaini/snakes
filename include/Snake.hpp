@@ -51,8 +51,8 @@ public:
 
     Snake(Game *, int = 1);
     void init(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
-    // void move(sf::Keyboard::Key); // for keyboard movement
-    void update();
+    void move(sf::Keyboard::Key); // for keyboard movement
+    void update(bool log=false);
 };
 
 #endif

@@ -4,23 +4,27 @@ Individual::Individual() :
     Game() {
     // init();
     fitness = 0.0;
+    score = 0;
 }
 
 Individual::Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     Game(w, b) {
     // init(w, b);
     fitness = 0.0;
+    score = 0;
 }
 
 Individual::Individual(const Individual &other) :
     Game(other) {
     // init(other.snake.net.weights, other.snake.net.biases);
     fitness = other.fitness;
+    score = other.score;
 }
 
 Individual &Individual::operator=(const Individual &other) {
     init(other.snake.net.weights, other.snake.net.biases);
     fitness = other.fitness;
+    score = other.score;
     return *this;
 }
 
@@ -33,4 +37,5 @@ void Individual::start() {
         snake.update();
     }
     fitness = snake.fitness;
+    score = snake.score;
 }

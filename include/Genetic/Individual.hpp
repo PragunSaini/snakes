@@ -11,6 +11,7 @@ private:
 
 public:
     double fitness;
+    int score;
 
     Individual();
     Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);

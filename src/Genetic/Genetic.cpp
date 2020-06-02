@@ -84,9 +84,6 @@ GeneticAlgo::GeneticAlgo() :
 }
 
 void GeneticAlgo::start() {
-    // for (int i = 0; i < 100; i++) {
-    //     offsprings[i].snake.net.loadFromFile(i%2);
-    // }
     int lastImprov = 0;
 
     while (++currGen < generations) {
@@ -104,20 +101,25 @@ void GeneticAlgo::start() {
             globalBest.clear();
             globalBest.insert(globalBest.end(), population.begin(), population.begin() + 150);
         }
-        if (lastImprov % 500 == 0) {mutationProb *= 1.025; if (mutationProb > 0.3) mutationProb = 0.3;} 
+        if (lastImprov % 250 == 0) {mutationProb *= 1.025; if (mutationProb > 0.4) mutationProb = 0.3;} 
 
-        if (lastImprov > 15000) break;
+        // if (lastImprov > 15000) break;
 
         // Print stats
         if (currGen % 100 == 0) {
             std::cout << "----------------------" << "\n";
             std::cout << "Generation : " << currGen << "\n";
-            // std::cout << "Round Best Fitness : " << population[0].fitness << "\n";
             std::cout << "Best Fitness : " << globalBest[0].fitness << "\n";
-            std::cout << "Second Best Fitness : " << globalBest[1].fitness << "\n";
+            std::cout << "Best Score : " << globalBest[0].score << "\n";
             std::cout << "Last Improv : " << lastImprov << "\n";
         }
 
+        if (currGen >= 2000 && currGen % 500 == 0) {
+            std::cout << "Continue ?";
+            char ch;
+            std::cin >> ch;
+            if (ch != 'Y' && ch != 'y') break; 
+        } 
         // Select best for new population
         nextGeneration();
     }
@@ -126,10 +128,10 @@ void GeneticAlgo::start() {
     for (int i = 0; i < 150; i++) {
         std::cout << globalBest[i].fitness << "\n";
         globalBest[i].snake.net.saveToFile(i);
-        if (i < 10) {
+        // if (i < 10) {
             // Render rend(globalBest[i].snake.net.weights, globalBest[i].snake.net.biases);
             // rend.start();
-        }
+        // }
     }
 }
 

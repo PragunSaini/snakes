@@ -8,11 +8,11 @@ namespace Config {
     const int WIDTH = 1000;  //1280
     const int HEIGHT = 1000; //720
 
-    const int FRAMERATE = 0; // set <= 0 for VSync
-    const double SNAKESPEED = 30;
+    const int FRAMERATE = 100; // set <= 0 for VSync
+    const double SNAKESPEED = 100;
 
-    const int ROWS = 100; // 90
-    const int COLS = 100; // 160
+    const int ROWS = 10; // 90
+    const int COLS = 10; // 160
 
     const int FOODCNT = 1;
 
@@ -23,8 +23,8 @@ namespace Config {
 
     const int POPSIZE = 500;    // was 500
     const int NEW_POPSIZE = 1000;   // was 1000
-    const int GENERATIONS = 30000;  // was 30000
-    const double SBX_ETA = 100; // was 200
+    const int GENERATIONS = 10000;  // was 30000
+    const double SBX_ETA = 200; // was 200
     const double MUTATION_RATE = 0.05;  // was 0.1
 
 

@@ -98,13 +98,15 @@ void GeneticAlgo::start() {
         elitismSelection();
 
         // Update current best
-        if (globalBest.empty() || globalBest[0].fitness <= population[0].fitness) {
+        if (globalBest.empty() || globalBest[0].fitness < population[0].fitness) {
             mutationProb = Config::MUTATION_RATE;
             lastImprov = 0;
             globalBest.clear();
             globalBest.insert(globalBest.end(), population.begin(), population.begin() + 150);
         }
-        if (lastImprov % 200 == 0) {mutationProb *= 1.025; if (mutationProb > 0.3) mutationProb = 0.25;} 
+        if (lastImprov % 500 == 0) {mutationProb *= 1.025; if (mutationProb > 0.3) mutationProb = 0.3;} 
+
+        if (lastImprov > 15000) break;
 
         // Print stats
         if (currGen % 100 == 0) {
@@ -155,7 +157,7 @@ void GeneticAlgo::crossoverAndMutation(double totalFit) {
     for (int i = 0; i < 2; i++) {
         double pick = dist(GeneticUtils::gen);
         double current = 0;
-        for (int j = 0; j < 150; j++) { // popSize, 150
+        for (int j = 0; j < popSize; j++) { // popSize, 150
             current += population[j].fitness;
             if (current >= pick) {
                 if (i == 0) {
@@ -205,7 +207,7 @@ void GeneticAlgo::nextGeneration() {
         offsprings.push_back(indiv);
     }
     double totFitness = 0.0;
-    for(int i = 0; i < 150; i++) {// popSize, 150
+    for(int i = 0; i < popSize; i++) {// popSize, 150
         totFitness += population[i].fitness;
     }
 

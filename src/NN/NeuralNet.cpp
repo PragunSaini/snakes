@@ -56,7 +56,7 @@ void NeuralNet::weightInitializer() {
 }
 
 Eigen::VectorXd NeuralNet::activate(const Eigen::VectorXd &inputs, int l) {
-    if (l < layers - 2) {
+    if (l == layers - 2) {
         return 1.0 / (1.0 + (inputs * -1).array().exp());
     }
     // else if (l == size)

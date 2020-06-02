@@ -235,15 +235,15 @@ void Snake::die() {
 }
 
 void Snake::calculateFitness() {
-    // fitness = steps +
-    //           (std::pow(2, score) + std::pow(score, 2.1) * 500) -
-    //           (std::pow(0.25 * steps, 1.3) * std::pow(score, 1.2));
-    // fitness = std::max(fitness, .1);
+    fitness = steps +
+              (std::pow(2.0, (double)score) + std::pow((double)score, 2.1) * 500) -
+              (std::pow(0.25 * steps, 1.3) * std::pow((double)score, 1.2));
+    fitness = std::max(fitness, .1);
     // fitness = steps*steps*std::pow(10, score);
     // fitness = (std::pow(2, score) / (2 << 3)) * steps;
     // else {
     // fitness = (std::pow(1.5, (double)score)) * (steps/10.0) + std::pow(score, 2);
-    fitness = (std::pow(2.0, (double)score)) * (steps/10);
+    // fitness = (std::pow(2.0, (double)score)) * (steps/10);
     // }
     // if (fitness < 0) {
     //     fitness = std::numeric_limits<double>::max();
@@ -271,26 +271,67 @@ std::vector<double> Snake::objectEncoder(int x) {
 Eigen::VectorXd Snake::getVision() {
     std::vector<double> res;
     res.reserve(32);
-
+    // int oppositeArr[4] = {4, 6, 0, 2};
     int visInd = ((int)snake[0].dir) * 2;
+    // int oppDir = oppositeArr[(int)snake[0].dir];
+
     for (int i = 0; i < 8; i++) {
         std::pair<int, int> d = visionDirs[visInd % 8];
         visInd++;
+        // if (visInd - 1 == oppDir) {
+        //     int dx = snake[0].x;
+        //     int dy = snake[0].y;
+        //     int obj = 0;
+        //     bool self = true;
+        //     do {
+        //         dx += d.first;
+        //         dy += d.second;
+        //         if (!inRange(dx, dy)) {
+        //             break;
+        //         }
+        //         if (self) {
+        //             if (game->grid[dy][dx] != color) {
+        //                 self = false;
+        //             }
+        //         }
+        //         if (!self && game->grid[dy][dx] != 0 && game->grid[dy][dx] < 10) {
+        //             obj = game->grid[dy][dx];
+        //             break;
+        //         }
+        //     } while (true);
+        //     std::vector<double> encoding = objectEncoder(obj);
+        //     res.insert(res.end(), encoding.begin(), encoding.end());
+        //     continue;
+        // }
+        std::vector<double> encoding(3, 0.0); // wall, apple, body
         int dx = snake[0].x;
         int dy = snake[0].y;
-        int obj = 0;
+        int dist = 0;
+        bool body = false;
+        bool food = false;
+        // int obj = 0;
         do {
+            dist++;
             dx += d.first;
             dy += d.second;
             if (!inRange(dx, dy)) {
+                encoding[0] = 1.0 / dist;
                 break;
             }
-            if (game->grid[dy][dx] != 0 && game->grid[dy][dx] < 10) {
-                obj = game->grid[dy][dx];
-                break;
+            if (!food && game->grid[dy][dx] == -1) {
+                food = true;
+                encoding[1] = 1.0 / dist;
             }
+            if (!body && game->grid[dy][dx] > 0 && game->grid[dy][dx] < 10) {
+                body = true;
+                encoding[2] = 1.0 / dist;
+            }
+            // if (game->grid[dy][dx] != 0 && game->grid[dy][dx] < 10) {
+            //     obj = game->grid[dy][dx];
+            //     break;
+            // }
         } while (true);
-        std::vector<double> encoding = objectEncoder(obj);
+        // std::vector<double> encoding = objectEncoder(obj);
         res.insert(res.end(), encoding.begin(), encoding.end());
     }
     std::vector<double> headDir(4, 0);
@@ -300,7 +341,7 @@ Eigen::VectorXd Snake::getVision() {
     std::vector<double> tailDir(4, 0);
     tailDir[(int)snake[length - 1].dir] = 1;
     res.insert(res.end(), tailDir.begin(), tailDir.end());
-    return Eigen::VectorXd::Map(res.data(), res.size());
+    Eigen::VectorXd haha = Eigen::VectorXd::Map(res.data(), res.size());
     // for (int i = 0; i < 32; i++) {
     //     if (i < 24) {
     //         if (i % 3 == 2) {
@@ -315,40 +356,45 @@ Eigen::VectorXd Snake::getVision() {
     //     }
     // }
     // std::cout << "\n";
-    // std::cout << Eigen::VectorXd::Map(res.data(), res.size()) << "\n";
-    // return haha;
+    return haha;
 }
 
 // For keyboard movement
-// void Snake::move(sf::Keyboard::Key key) {
-//     Direction dir = snake[0].dir;
-//     // Move the snake
-//     switch (key) {
-//     case sf::Keyboard::Up:
-//         if (dir != Direction::DOWN) {
-//             changedir = Direction::UP;
-//         }
-//         break;
+void Snake::move(sf::Keyboard::Key key) {
+    Direction dir = snake[0].dir;
+    // Move the snake
+    switch (key) {
+    case sf::Keyboard::Up:
+        if (dir != Direction::DOWN) {
+            changedir = Direction::UP;
+        }
+        break;
 
-//     case sf::Keyboard::Down:
-//         if (dir != Direction::UP) {
-//             changedir = Direction::DOWN;
-//         }
-//         break;
+    case sf::Keyboard::Down:
+        if (dir != Direction::UP) {
+            changedir = Direction::DOWN;
+        }
+        break;
 
-//     case sf::Keyboard::Left:
-//         if (dir != Direction::RIGHT) {
-//             changedir = Direction::LEFT;
-//         }
-//         break;
+    case sf::Keyboard::Left:
+        if (dir != Direction::RIGHT) {
+            changedir = Direction::LEFT;
+        }
+        break;
 
-//     case sf::Keyboard::Right:
-//         if (dir != Direction::LEFT) {
-//             changedir = Direction::RIGHT;
-//         }
-//         break;
+    case sf::Keyboard::Right:
+        if (dir != Direction::LEFT) {
+            changedir = Direction::RIGHT;
+        }
+        break;
 
-//     default:
-//         break;
-//     }
-// }
+    default:
+        break;
+    }
+}
+
+
+// 0 -> 4
+// 1 -> 6
+// 2 -> 0
+// 3 -> 2

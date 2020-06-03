@@ -1,41 +1,48 @@
-#include "Genetic/Individual.hpp"
+// #include "Genetic/Individual.hpp"
 
-Individual::Individual() :
-    Game() {
-    // init();
-    fitness = 0.0;
-    score = 0;
-}
+// Individual::Individual() :
+//     Game() {
+//     // init();
+//     fitness = 0.0;
+//     score = 0;
+// }
 
-Individual::Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
-    Game(w, b) {
-    // init(w, b);
-    fitness = 0.0;
-    score = 0;
-}
+// Individual::Individual(long long seed) :
+//     Game(seed) {
+//     // init();
+//     fitness = 0.0;
+//     score = 0;
+// }
 
-Individual::Individual(const Individual &other) :
-    Game(other) {
-    // init(other.snake.net.weights, other.snake.net.biases);
-    fitness = other.fitness;
-    score = other.score;
-}
+// Individual::Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
+//     Game(w, b) {
+//     // init(w, b);
+//     fitness = 0.0;
+//     score = 0;
+// }
 
-Individual &Individual::operator=(const Individual &other) {
-    init(other.snake.net.weights, other.snake.net.biases);
-    fitness = other.fitness;
-    score = other.score;
-    return *this;
-}
+// Individual::Individual(const Individual &other) :
+//     Game(other) {
+//     // init(other.snake.net.weights, other.snake.net.biases);
+//     fitness = other.fitness;
+//     score = other.score;
+// }
 
-bool Individual::operator>(const Individual &other) const {
-    return fitness > other.fitness;
-}
+// Individual &Individual::operator=(const Individual &other) {
+//     init(other.snake.net.weights, other.snake.net.biases);
+//     fitness = other.fitness;
+//     score = other.score;
+//     return *this;
+// }
 
-void Individual::start() {
-    while (snake.alive) {
-        snake.update();
-    }
-    fitness = snake.fitness;
-    score = snake.score;
-}
+// bool Individual::operator>(const Individual &other) const {
+//     return fitness > other.fitness;
+// }
+
+// void Individual::start() {
+//     while (snake.alive) {
+//         snake.update();
+//     }
+//     fitness = snake.fitness;
+//     score = snake.score;
+// }

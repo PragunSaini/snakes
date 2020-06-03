@@ -1,17 +1,13 @@
 #include "NN/NeuralNet.hpp"
+#include "Config.hpp"
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 
-std::mt19937 NN::gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+// Defining namespace members
+std::mt19937 NN::gen = std::mt19937(std::random_device()());
 std::uniform_real_distribution<double> NN::rand = std::uniform_real_distribution<double>(0.0, 1.0);
 std::normal_distribution<double> NN::randn = std::normal_distribution<double>(0.0, 1.0);
-
-double NN::relu(double z) {
-    return std::max(0.0, z);
-}
-
-double NN::sigmoid(double z) {
-    return 1.0 / (1.0 + std::exp(-z));
-}
 
 // Returns biases for a layer of size m
 Eigen::VectorXd NN::getBias(int m) {
@@ -20,8 +16,9 @@ Eigen::VectorXd NN::getBias(int m) {
 
 // Returns weights for layer n to m
 Eigen::MatrixXd NN::getWeight(int m, int n) {
-    double div = std::sqrt(n);
-    return Eigen::MatrixXd(m, n).unaryExpr([&](__attribute__((unused)) double dummy) { return NN::randn(NN::gen) / div; });
+    // double div = std::sqrt(n);
+    // return Eigen::MatrixXd(m, n).unaryExpr([&](__attribute__((unused)) double dummy) { return NN::randn(NN::gen) / div; });
+    return Eigen::MatrixXd(m, n).unaryExpr([&](__attribute__((unused)) double dummy) { return NN::randn(NN::gen); });
 }
 
 NeuralNet::NeuralNet() {}
@@ -29,16 +26,16 @@ NeuralNet::NeuralNet() {}
 NeuralNet::NeuralNet(const std::vector<int> &sizes) :
     sizes(sizes),
     layers(sizes.size()) {
-    actFuncs.resize(layers - 1, NN::sigmoid);
-    actFuncs[layers - 2] = NN::relu;
+    actFuncs.resize(layers - 1, ActFunc::RELU);
+    actFuncs[layers - 2] = ActFunc::SIGMOID;
     weightInitializer();
 }
 
 NeuralNet::NeuralNet(const std::vector<int> &sizes, const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     sizes(sizes),
     layers(sizes.size()) {
-    actFuncs.resize(layers - 1, NN::sigmoid);
-    actFuncs[layers - 2] = NN::relu;
+    actFuncs.resize(layers - 1, ActFunc::RELU);
+    actFuncs[layers - 2] = ActFunc::SIGMOID;
     weights = w;
     biases = b;
 }
@@ -56,13 +53,15 @@ void NeuralNet::weightInitializer() {
 }
 
 Eigen::VectorXd NeuralNet::activate(const Eigen::VectorXd &inputs, int l) {
-    if (l == layers - 2) {
+    switch (actFuncs[l]) {
+    case ActFunc::RELU:
+        return (Eigen::VectorXd)(inputs.array() < 0.0).select(0.0, inputs);
+        break;
+    case ActFunc::SIGMOID:
         return 1.0 / (1.0 + (inputs * -1).array().exp());
-    }
-    // else if (l == size)
-    else {
-        // return inputs.unaryExpr(actFuncs[l]);
-        return inputs.unaryExpr([&](double z) { return std::max(0.0, z); });
+        break;
+    default:
+        return inputs;
     }
 }
 
@@ -77,8 +76,8 @@ Eigen::VectorXd NeuralNet::feedforward(Eigen::VectorXd inputs) {
 void NeuralNet::saveToFile(int fileOffset) {
     std::ofstream ofs("saves/NN" + std::to_string(fileOffset) + ".net");
     for (int i = 0; i < layers - 1; i++) {
-        ofs << weights[i] << std::endl;
-        ofs << biases[i] << std::endl;
+        ofs << std::setprecision(std::numeric_limits<double>::max_digits10) << weights[i] << std::endl;
+        ofs << std::setprecision(std::numeric_limits<double>::max_digits10) << biases[i] << std::endl;
     }
 }
 

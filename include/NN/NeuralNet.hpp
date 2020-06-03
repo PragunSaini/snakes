@@ -2,47 +2,49 @@
 #define NEURAL_NET_HPP
 
 #include <Eigen/Dense>
-#include <chrono>
-#include <cmath>
-#include <fstream>
 #include <random>
 #include <vector>
 
-// Activation Functions
+// NN Utilities
 namespace NN {
+    // RNGs
     extern std::mt19937 gen;
     extern std::normal_distribution<double> randn;
     extern std::uniform_real_distribution<double> rand;
 
-    double sigmoid(double);
-    double relu(double);
-
+    // Random initializers
     Eigen::VectorXd getBias(int);
     Eigen::MatrixXd getWeight(int, int);
 }; // namespace NN
 
-// Feedforward Neural Network
+// Activation functions
+enum ActFunc {
+    SIGMOID,
+    RELU
+};
+
+/*
+ * Feedforward Neural Network
+ */
 class NeuralNet {
-
 private:
-    std::vector<int> sizes;
-    int layers;
-    std::vector<double (*)(double)> actFuncs;
+    std::vector<int> sizes;        // layer sizes
+    int layers;                    // number of layers
+    std::vector<ActFunc> actFuncs; // activation functions for each layer
 
-    void weightInitializer();
-    std::vector<double> dot(const Eigen::MatrixXd &, const Eigen::VectorXd &);
-    std::vector<double> add(const Eigen::VectorXd &, const Eigen::VectorXd &);
-    Eigen::VectorXd activate(const Eigen::VectorXd &, int = -1);
+    void weightInitializer();                                    // random initializer
+    Eigen::VectorXd activate(const Eigen::VectorXd &, int = -1); // apply activation functions
 
 public:
-    std::vector<Eigen::VectorXd> biases;
-    std::vector<Eigen::MatrixXd> weights;
+    std::vector<Eigen::VectorXd> biases;  // NN biases
+    std::vector<Eigen::MatrixXd> weights; // NN weights
+
     NeuralNet();
     NeuralNet(const std::vector<int> &);
     NeuralNet(const std::vector<int> &, const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
-    Eigen::VectorXd feedforward(Eigen::VectorXd);
-    void saveToFile(int fileOffset = 0);
-    void loadFromFile(int fileOffset = 0);
+    Eigen::VectorXd feedforward(Eigen::VectorXd); // get feedforward outputs
+    void saveToFile(int fileOffset = 0);          // save network to file
+    void loadFromFile(int fileOffset = 0);        // load network from file
 };
 
 #endif

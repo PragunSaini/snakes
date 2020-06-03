@@ -1,6 +1,6 @@
 CXX := g++
 CXX_FLAGS := -std=c++11 -DNDEBUG -Ofast -march=native -mavx -mfma -msse2 -fopenmp -ffast-math -fno-math-errno
-CXX_DFLAGS := -std=c++11 -ggdb -Ofast -march=native -mavx -mfma -msse2 -fopenmp -ffast-math -fno-math-errno
+CXX_DLAGS := -std=c++11 -ggdb -Ofast -march=native -mavx -mfma -msse2 -fopenmp -ffast-math -fno-math-errno
 LIBRARIES := -lsfml-graphics -lsfml-window -lsfml-system
 WARNING := -Wall -Wextra
 
@@ -13,7 +13,7 @@ EXECUTABLE := main
 SOURCES := $(shell find $(SRC) -name *.cpp | cut -d'/' -f2- )
 OBJS := $(patsubst %.cpp, %.o, $(SOURCES))
 DEPENDS := $(patsubst %.cpp, %.d, $(SOURCES))
-DIRS := bin bin/NN bin/Genetic
+DIRS := bin bin/NN bin/Genetic bin/Game
 
 
 all: setup $(BIN)/$(EXECUTABLE)

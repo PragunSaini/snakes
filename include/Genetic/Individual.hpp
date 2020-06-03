@@ -1,25 +1,21 @@
-// #ifndef INDIVIDUAL_HPP
-// #define INDIVIDUAL_HPP
+#ifndef INDIVIDUAL_HPP
+#define INDIVIDUAL_HPP
 
-// #include "Game.hpp"
-// #include <iostream>
-// #include <vector>
+#include "Game/Game.hpp"
 
-// class Individual : public Game {
-// private:
-//     // void init(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
+/*
+ * Individual used as chromosome in GA
+ */
+class Individual : public Game {
+public:
+    double fitness; // fitness achieved by snake
+    int score;      // score achieved by snake
 
-// public:
-//     double fitness;
-//     int score;
+    Individual();
+    Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
+    Individual(const Individual &);
+    bool operator>(const Individual &) const;
+    void start();
+};
 
-//     Individual();
-//     Individual(long long seed);
-//     Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
-//     Individual(const Individual &);
-//     Individual &operator=(const Individual &);
-//     bool operator>(const Individual &) const;
-//     void start();
-// };
-
-// #endif
+#endif

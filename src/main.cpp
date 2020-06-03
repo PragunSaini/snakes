@@ -3,9 +3,9 @@
 #include <iostream>
 
 int main() {
-    // GeneticAlgo gen;
-    // gen.start();
+    GeneticAlgo gen;
+    gen.start();
 
-    Render render;
-    render.start();
+    // Render render;
+    // render.start();
 }

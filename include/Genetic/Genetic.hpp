@@ -1,49 +1,52 @@
-// #ifndef GENETIC_CPP
-// #define GENETIC_CPP
+#ifndef GENETIC_CPP
+#define GENETIC_CPP
 
-// #include "Genetic/Individual.hpp"
-// #include "Render.hpp"
-// #include <Eigen/Dense>
-// #include <algorithm>
-// #include <iostream>
-// #include <random>
-// #include <utility>
-// #include <vector>
+#include "Game/Render.hpp"
+#include "Genetic/Individual.hpp"
+#include <Eigen/Dense>
+#include <algorithm>
+#include <random>
+#include <utility>
+#include <vector>
 
-// namespace GeneticUtils {
-//     extern std::mt19937 gen;
-//     extern std::normal_distribution<double> randn;
-//     extern std::uniform_real_distribution<double> rand;
-// }; // namespace GeneticUtils
+namespace GeneticUtils {
+    // RNGs
+    extern std::mt19937 gen;
+    extern std::normal_distribution<double> randn;
+    extern std::uniform_real_distribution<double> rand;
+}; // namespace GeneticUtils
 
-// class GeneticAlgo {
-// private:
-//     static int generations;
-//     static int popSize;
-//     static int offSpringSize;
-//     static double etaX;
-//     static double mutationProb;
+class GeneticAlgo {
+private:
+    static int generations;
+    static int popSize;
+    static int offspringsSize;
+    static double etaX;
+    static double mutationProb;
 
-//     static std::pair<Eigen::MatrixXd, Eigen::MatrixXd> simulatedBinaryCrossover(const Eigen::MatrixXd &, const Eigen::MatrixXd &);
-//     static std::pair<Eigen::VectorXd, Eigen::VectorXd> simulatedBinaryCrossover(const Eigen::VectorXd &, const Eigen::VectorXd &);
-//     static std::pair<Eigen::MatrixXd, Eigen::MatrixXd> singlePointCrossover(const Eigen::MatrixXd &, const Eigen::MatrixXd &);
-//     static std::pair<Eigen::VectorXd, Eigen::VectorXd> singlePointCrossover(const Eigen::VectorXd &, const Eigen::VectorXd &);
-//     static void gaussianMutation(Eigen::MatrixXd &);
-//     static void gaussianMutation(Eigen::VectorXd &);
+    // Genetic operators
+    // CROSSOVER
+    static std::pair<Eigen::MatrixXd, Eigen::MatrixXd> simulatedBinaryCrossover(const Eigen::MatrixXd &, const Eigen::MatrixXd &);
+    static std::pair<Eigen::VectorXd, Eigen::VectorXd> simulatedBinaryCrossover(const Eigen::VectorXd &, const Eigen::VectorXd &);
+    static std::pair<Eigen::MatrixXd, Eigen::MatrixXd> singlePointCrossover(const Eigen::MatrixXd &, const Eigen::MatrixXd &);
+    static std::pair<Eigen::VectorXd, Eigen::VectorXd> singlePointCrossover(const Eigen::VectorXd &, const Eigen::VectorXd &);
 
-//     int currGen;
-//     std::vector<Individual> population;
-//     std::vector<Individual> offsprings;
-//     std::vector<Individual> globalBest;
+    // MUTATION
+    static void gaussianMutation(Eigen::MatrixXd &);
+    static void gaussianMutation(Eigen::VectorXd &);
 
-// public:
-//     GeneticAlgo();
-//     void start();
-//     void calculateFitness();
-//     void elitismSelection();
-//     void crossoverAndMutation(double totalFit);
-//     void nextGeneration();
-//     // std::vector<Individual> selection();
-// };
+    int currentGen;                     // current generation number
+    std::vector<Individual> population; // current population
+    std::vector<Individual> offsprings; // new offsprings
+    std::vector<Individual> globalBest; // best individuals
 
-// #endif
+public:
+    GeneticAlgo();
+    void calculateFitness();                    // find fitness of offsprings by running the game
+    void elitismSelection();                    // Select the best individuals from offsprings to serve as new population
+    void crossoverAndMutation(double totalFit); // Perform roulette selection, crossover and mutation to generate 2 new offsprings
+    void nextGeneration();                      // Generate the offsprings for next generation
+    void start(bool = true);                    // start the GA
+};
+
+#endif

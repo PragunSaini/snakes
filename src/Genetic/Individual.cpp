@@ -13,9 +13,15 @@ Individual::Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<
 }
 
 Individual::Individual(const Individual &other) :
-    Game(other) {
+    Game(other),
+    fitness(other.fitness),
+    score(other.score) {}
+
+Individual &Individual::operator=(const Individual &other) {
+    Game::operator=(other);
     fitness = other.fitness;
     score = other.score;
+    return *this;
 }
 
 bool Individual::operator>(const Individual &other) const {
@@ -23,6 +29,7 @@ bool Individual::operator>(const Individual &other) const {
 }
 
 void Individual::start() {
+    initObjects();
     while (snake.alive) {
         snake.look(grid);
         snake.determineMove();

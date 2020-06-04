@@ -79,6 +79,7 @@ void NeuralNet::saveToFile(int fileOffset) {
         ofs << std::setprecision(std::numeric_limits<double>::max_digits10) << weights[i] << std::endl;
         ofs << std::setprecision(std::numeric_limits<double>::max_digits10) << biases[i] << std::endl;
     }
+    ofs.close();
 }
 
 void NeuralNet::loadFromFile(int fileOffset) {
@@ -103,4 +104,5 @@ void NeuralNet::loadFromFile(int fileOffset) {
         }
         biases[l] = Eigen::VectorXd::Map(b.data(), b.size());
     }
+    ifs.close();
 }

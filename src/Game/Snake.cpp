@@ -130,14 +130,17 @@ Eigen::VectorXd Snake::getVision(std::vector<std::vector<int>> &grid) {
 }
 
 void Snake::look(std::vector<std::vector<int>> &grid) {
-    // Hide tail from vision since it will be moved
-    // grid[snake.back().y][snake.back().x] = 0;
+    // Hide tail
+    grid[snake.back().y][snake.back().x] = 0;
 
     // Find direction to move in using NN
     Eigen::VectorXd res = net.feedforward(getVision(grid));
     int dist;
     res.maxCoeff(&dist);
     changedir = (Direction)dist;
+
+    // Show tail
+    grid[snake.back().y][snake.back().x] = color;
 }
 
 void Snake::determineMove() {

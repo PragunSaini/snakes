@@ -7,8 +7,20 @@ Render::Render(bool vision) :
     initializeWindow();
 }
 
+Render::Render(unsigned int seed, bool vision) :
+    Game(seed),
+    vision(vision) {
+    initializeWindow();
+}
+
 Render::Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     Game(w, b),
+    vision(true) {
+    initializeWindow();
+}
+
+Render::Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b, unsigned int seed) :
+    Game(w, b, seed),
     vision(true) {
     initializeWindow();
 }
@@ -17,6 +29,13 @@ Render::Render(const Render &other) :
     Game(other),
     vision(other.vision) {
     initializeWindow();
+}
+
+Render &Render::operator=(const Render &other) {
+    Game::operator=(other);
+    vision = other.vision;
+    initializeWindow();
+    return *this;
 }
 
 void Render::initializeWindow() {
@@ -87,10 +106,14 @@ void Render::handleEvents(sf::Event event) {
 }
 
 void Render::start() {
+    // Init food and snake
+    initObjects();
+
     // Start the clocks
     snakeUpdate.restart();
     fps.restart();
 
+    // Start game loop
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {

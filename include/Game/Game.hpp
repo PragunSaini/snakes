@@ -7,6 +7,15 @@
 #include <vector>
 
 /*
+ * Used to generate seeds
+ */
+namespace Seeder {
+    extern std::mt19937 generator;
+    extern std::uniform_int_distribution<int> seeds;
+    extern unsigned int getSeed();
+}; // namespace Seeder
+
+/*
  * Abstract class to handle games
  */
 class Game {
@@ -19,7 +28,7 @@ private:
     std::uniform_int_distribution<int> randDir;
 
 protected:
-    // Grid, NN, Snake and Food Initializer
+    // Grid and NN
     void init(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
 
 public:
@@ -29,10 +38,11 @@ public:
     int foodCount;                      // count of food on grid
 
     Game();
-    Game(unsigned int seed);
+    Game(unsigned int);
     Game(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
-    Game(const Game &);
-    virtual void start() = 0; // abstract function to start the game
+    Game(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b, unsigned int);
+    Game(const Game &);            // copy constructor - copies seed too
+    Game &operator=(const Game &); // copy constructor - copies seed too
 
     // Functions for RNG
     int getX();
@@ -40,6 +50,12 @@ public:
     int getDir();
     std::mt19937 &getGen();
     unsigned int getSeed();
+    void reseed();      // to reseed the game
+    void initObjects(); // initializes snake and food
+    void saveToFile(int);
+    void loadFromFile(int);
+
+    virtual void start() = 0; // abstract function to start the game
 };
 
 #endif

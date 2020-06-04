@@ -26,9 +26,12 @@ private:
     void handleEvents(sf::Event); // Handle key events
 
 public:
-    Render(bool = false);
+    Render(bool = true);
+    Render(unsigned int seed, bool = true);
     Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
+    Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b, unsigned int);
     Render(const Render &);
+    Render &operator=(const Render &);
     void start();
 };
 

@@ -1,11 +1,11 @@
 #include "Game/Render.hpp"
 #include "Genetic/Genetic.hpp"
-#include <iostream>
 
 int main() {
-    GeneticAlgo gen;
-    gen.start();
+    // GeneticAlgo gen;
+    // gen.start();
 
     // Render render;
+    // render.loadFromFile(0);
     // render.start();
 }

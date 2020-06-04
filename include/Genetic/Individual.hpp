@@ -14,7 +14,8 @@ public:
     Individual();
     Individual(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b);
     Individual(const Individual &);
-    bool operator>(const Individual &) const;
+    Individual &operator=(const Individual &);
+    bool operator>(const Individual &) const; // for sorting population
     void start();
 };
 

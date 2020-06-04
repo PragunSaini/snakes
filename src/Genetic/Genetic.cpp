@@ -86,7 +86,6 @@ void GeneticAlgo::gaussianMutation(Eigen::VectorXd &b) {
     b = (rand.array() < mutationProb).select(mutations, b);
 }
 
-// // NON-STATIC MEMBERS AND FUNCTIONS
 GeneticAlgo::GeneticAlgo() :
     offsprings(std::vector<Individual>(popSize)) {
     currentGen = 0;
@@ -158,8 +157,8 @@ void GeneticAlgo::crossoverAndMutation(double totalFit) {
     }
 
     // Add to offsprings
-    offsprings.push_back(Individual(offWeights1, offBiases1));
-    offsprings.push_back(Individual(offWeights2, offBiases2));
+    offsprings.emplace_back(offWeights1, offBiases1);
+    offsprings.emplace_back(offWeights2, offBiases2);
 }
 
 void GeneticAlgo::nextGeneration() {
@@ -169,11 +168,12 @@ void GeneticAlgo::nextGeneration() {
     // Carry forward current population to next generation as is
     for (Individual &indiv : population) {
         offsprings.push_back(indiv);
+        offsprings.back().reseed(); // important, otherwise parents will replay performance
     }
 
     // Find total fitness of current population (for roulette selection)
     double totFitness = 0.0;
-    for (int i = 0; i < popSize; i++) { // Config::POPSIZE, 150
+    for (int i = 0; i < popSize; i++) {
         totFitness += population[i].fitness;
     }
 
@@ -191,6 +191,7 @@ void GeneticAlgo::start(bool log) {
 
     while (++currentGen < generations) {
         lastImprov++;
+
         // First let the current population calculate fitness
         calculateFitness();
 
@@ -198,22 +199,27 @@ void GeneticAlgo::start(bool log) {
         elitismSelection();
 
         // Update current best
-        if (globalBest.empty() || globalBest[0].fitness < population[0].fitness || population[0].score == 97) {
-            // mutationProb = Config::MUTATION_RATE;
+        if (globalBest.empty() || globalBest[0].fitness < population[0].fitness || population[0].score == Config::ROWS * Config::COLS - 3) {
+            // Reset mutation rate
+            mutationProb = Config::MUTATION_RATE;
             lastImprov = 0;
-            globalBest.clear();
-            globalBest.insert(globalBest.end(), population.begin(), population.begin() + 150);
-        }
-        // if (lastImprov > 0 && lastImprov % 200 == 0) {
-        //     mutationProb *= 1.025;
-        //     if (mutationProb > 0.4)
-        //         mutationProb = 0.15;
-        // }
 
-        // if (lastImprov > 15000) break;
+            // Save best 10 of the population
+            globalBest.clear();
+            for (int i = 0; i < 10; i++) {
+                globalBest.push_back(population[i]);
+            }
+        }
+
+        // If no improvement for a long time, increase mutation rate
+        if (lastImprov > 0 && lastImprov % 200 == 0) {
+            mutationProb *= 1.025;
+            if (mutationProb > 0.4)
+                mutationProb = 0.15;
+        }
 
         if (log) {
-            // Print stats
+            // Print stats, every 100th generation
             if (currentGen % 100 == 0) {
                 std::cout << "----------------------"
                           << "\n";
@@ -225,8 +231,8 @@ void GeneticAlgo::start(bool log) {
         }
 
         // Check if exit??
-        if ((currentGen >= 500 && currentGen % 100 == 0 && globalBest[0].score == 97)) {
-            std::cout << "Continue ?";
+        if ((currentGen >= 500 && currentGen % 100 == 0 && globalBest[0].score == Config::ROWS * Config::COLS - 3)) {
+            std::cout << "Best snake achieved, want to continue ?";
             char ch;
             std::cin >> ch;
             if (ch != 'Y' && ch != 'y')
@@ -238,16 +244,11 @@ void GeneticAlgo::start(bool log) {
     }
 
     // Print and store results
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
         if (log)
-            std::cout << globalBest[i].fitness << "\n";
-        globalBest[i].snake.net.saveToFile(i);
+            std::cout << globalBest[i].fitness << " | " << globalBest[i].score << "\n";
+        globalBest[i].saveToFile(i);
     }
-
-    if (log) {
-        for (int j = 0; j < 5; j++) {
-            Render rend(globalBest[j].snake.net.weights, globalBest[j].snake.net.biases);
-            rend.start();
-        }
-    }
+    std::cout << "Training Complete !!"
+              << "\n";
 }

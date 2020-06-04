@@ -9,7 +9,7 @@ namespace Config {
     const int HEIGHT = 900; //720
 
     const int FRAMERATE = 0; // set <= 0 for VSync
-    const double SNAKESPEED = 10;
+    const double SNAKESPEED = 100;
 
     const int ROWS = 10; // 90
     const int COLS = 10; // 160
@@ -26,7 +26,7 @@ namespace Config {
     const double SBX_ETA = 100;        // was 200
     const double MUTATION_RATE = 0.05; // was 0.1
 
-    const bool CLOCKWISE_VISION = true;
+    const bool CLOCKWISE_VISION = false;
     const int VISION_TYPE = 1; // 1 for distance, 0 for binary
 
 } // namespace Config

@@ -6,6 +6,9 @@
 #include <vector>
 
 void FoodManager::generateFood(Game *game, int count) {
+    if (count == 0)
+        return;
+
     std::vector<std::pair<int, int>> empty;
     for (int x = 0; x < Config::COLS; x++) {
         for (int y = 0; y < Config::ROWS; y++) {

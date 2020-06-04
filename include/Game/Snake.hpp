@@ -39,9 +39,7 @@ public:
  */
 class Snake {
     static std::vector<std::pair<int, int>> visionDirs; // Directions for snake's vision
-    int color;                                          // color of the snake
     Direction changedir;                                // Used to change direction
-    int length;                                         // Snake's length
     int stepsSinceFood;                                 // Remaining steps since last eaten food
 
     // Temporary fields to store head movements
@@ -54,6 +52,10 @@ class Snake {
     bool inRange(int, int);                                     // checks coordinates in grid
     void calculateFitness();                                    // calculate fitness of snake's game
     void die(std::vector<std::vector<int>> &);                  // snake ga shinda
+
+protected:
+    int length; // Snake's length
+    int color;  // color of the snake
 
 public:
     std::deque<Snakebody> snake; // Snake's body

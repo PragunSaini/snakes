@@ -21,7 +21,7 @@ private:
     sf::Text score;          // used to display score
     sf::Clock fps;           // to display FPS
 
-    void initializeWindow();      // used to set framerate
+    void initializeWindow();      // used to setup window
     void draw();                  // Draw the screen
     void handleEvents(sf::Event); // Handle key events
 

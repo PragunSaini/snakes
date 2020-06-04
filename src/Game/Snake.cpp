@@ -19,9 +19,9 @@ std::vector<std::pair<int, int>> Snake::visionDirs = {
 };
 
 Snake::Snake(int color) :
-    color(color),
     changedir(Direction::SAME),
     stepsSinceFood(Config::ROWS * Config::COLS),
+    color(color),
     alive(true),
     score(0),
     steps(0),
@@ -302,23 +302,3 @@ void Snake::handleEvent(sf::Keyboard::Key key) {
         break;
     }
 }
-
-// 0 -> 4
-// 1 -> 6
-// 2 -> 0
-// 3 -> 2
-
-// for (int i = 0; i < 32; i++) {
-//     if (i < 24) {
-//         if (i % 3 == 2) {
-//             std::cout << res[i] << " | ";
-//         }
-//         else {
-//             std::cout << res[i] << ", ";
-//         }
-//     }
-//     else {
-//         std::cout << res[i] << " . ";
-//     }
-// }
-// std::cout << "\n";

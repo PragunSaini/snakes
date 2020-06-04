@@ -185,7 +185,45 @@ void GeneticAlgo::nextGeneration() {
     }
 }
 
-void GeneticAlgo::start(bool log) {
+void GeneticAlgo::updateAndLog(int &lastImprov, bool log, bool saveBestPerGeneration) {
+    // Update current best (if new best found or maximum score achieved)
+    if (globalBest.empty() || globalBest[0].fitness < population[0].fitness || population[0].score == Config::ROWS * Config::COLS - 3) {
+        // Reset mutation rate
+        mutationProb = Config::MUTATION_RATE;
+        lastImprov = 0;
+
+        // Save best 10 of the population
+        globalBest.clear();
+        for (int i = 0; i < 10; i++) {
+            globalBest.push_back(population[i]);
+        }
+    }
+
+    // If no improvement for a long time, increase mutation rate
+    if (lastImprov > 0 && lastImprov % 200 == 0) {
+        mutationProb *= 1.025;
+        if (mutationProb > 0.4)
+            mutationProb = 0.15;
+    }
+
+    if (log) {
+        // Print stats, every 100th generation
+        if (currentGen % 100 == 0) {
+            std::cout << "----------------------"
+                      << "\n";
+            std::cout << "Generation : " << currentGen << "\n";
+            std::cout << "Best Fitness : " << globalBest[0].fitness << "\n";
+            std::cout << "Best Score : " << globalBest[0].score << "\n";
+            std::cout << "Last Improv : " << lastImprov << "\n";
+        }
+    }
+
+    if (saveBestPerGeneration) {
+        population[0].saveToFile(currentGen);
+    }
+}
+
+void GeneticAlgo::start(bool log, bool saveBestPerGeneration) {
     // track improvements
     int lastImprov = 0;
 
@@ -198,40 +236,11 @@ void GeneticAlgo::start(bool log) {
         // Then perform selection of parents
         elitismSelection();
 
-        // Update current best
-        if (globalBest.empty() || globalBest[0].fitness < population[0].fitness || population[0].score == Config::ROWS * Config::COLS - 3) {
-            // Reset mutation rate
-            mutationProb = Config::MUTATION_RATE;
-            lastImprov = 0;
+        // Update best and log
+        updateAndLog(lastImprov, log, saveBestPerGeneration);
 
-            // Save best 10 of the population
-            globalBest.clear();
-            for (int i = 0; i < 10; i++) {
-                globalBest.push_back(population[i]);
-            }
-        }
-
-        // If no improvement for a long time, increase mutation rate
-        if (lastImprov > 0 && lastImprov % 200 == 0) {
-            mutationProb *= 1.025;
-            if (mutationProb > 0.4)
-                mutationProb = 0.15;
-        }
-
-        if (log) {
-            // Print stats, every 100th generation
-            if (currentGen % 100 == 0) {
-                std::cout << "----------------------"
-                          << "\n";
-                std::cout << "Generation : " << currentGen << "\n";
-                std::cout << "Best Fitness : " << globalBest[0].fitness << "\n";
-                std::cout << "Best Score : " << globalBest[0].score << "\n";
-                std::cout << "Last Improv : " << lastImprov << "\n";
-            }
-        }
-
-        // Check if exit??
-        if ((currentGen >= 500 && currentGen % 100 == 0 && globalBest[0].score == Config::ROWS * Config::COLS - 3)) {
+        // Upon maximum score, check if wanna exit ?
+        if ((currentGen >= 100 && currentGen % 100 == 0 && globalBest[0].score == Config::ROWS * Config::COLS - 3)) {
             std::cout << "Best snake achieved, want to continue ?";
             char ch;
             std::cin >> ch;
@@ -243,12 +252,15 @@ void GeneticAlgo::start(bool log) {
         nextGeneration();
     }
 
-    // Print and store results
-    for (int i = 0; i < 10; i++) {
-        if (log)
+    // Print results
+    if (log) {
+        for (int i = 0; i < 10; i++)
             std::cout << globalBest[i].fitness << " | " << globalBest[i].score << "\n";
-        globalBest[i].saveToFile(i);
     }
+
+    // Save the best snake with file offset 0
+    globalBest[0].saveToFile(0);
+
     std::cout << "Training Complete !!"
               << "\n";
 }

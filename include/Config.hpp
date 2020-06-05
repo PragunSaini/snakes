@@ -6,14 +6,14 @@
 
 namespace Config {
     // Screen Params
-    const int WIDTH = 1000;
-    const int HEIGHT = 1000;
+    const int WIDTH = 500;
+    const int HEIGHT = 500;
 
     const int FRAMERATE = 0; // set <= 0 for VSync
-    const double SNAKESPEED = 60;
+    const double SNAKESPEED = 100;
 
-    const int ROWS = 100; // 90
-    const int COLS = 100; // 160
+    const int ROWS = 10; // 90
+    const int COLS = 10; // 160
 
     // NN layers
     const std::vector<int> LAYERS = {32, 20, 12, 4};

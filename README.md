@@ -19,3 +19,12 @@ The better snakes are carried over to the next generation and this process is re
 ---
 
 It is possible to achive a snake of optimal performance.
+
+##### Screenshots
+![Snake 1](https://i.ibb.co/Q9htfvk/snake1.png)
+![Snake 2](https://i.ibb.co/QPwxg1V/snake1.png)
+![Snake 3](https://i.ibb.co/449nC9z/snake1.png)
+
+##### Notes
+- For fast (vectorized) matrix operations I have used [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page).
+- Originally I intended to make a snake tournament, but it takes too much time to test and train on my machine, so it's not complete yet. Maybe some day......

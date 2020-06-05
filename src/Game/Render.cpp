@@ -3,37 +3,43 @@
 
 Render::Render(bool vision) :
     Game(),
-    vision(vision) {
+    vision(vision),
+    started(false) {
     initializeWindow();
 }
 
 Render::Render(unsigned int seed, bool vision) :
     Game(seed),
-    vision(vision) {
+    vision(vision),
+    started(false) {
     initializeWindow();
 }
 
 Render::Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     Game(w, b),
-    vision(true) {
+    vision(true),
+    started(false) {
     initializeWindow();
 }
 
 Render::Render(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b, unsigned int seed) :
     Game(w, b, seed),
-    vision(true) {
+    vision(true),
+    started(false) {
     initializeWindow();
 }
 
 Render::Render(const Render &other) :
     Game(other),
-    vision(other.vision) {
+    vision(other.vision),
+    started(false) {
     initializeWindow();
 }
 
 Render &Render::operator=(const Render &other) {
     Game::operator=(other);
     vision = other.vision;
+    started = false;
     initializeWindow();
     return *this;
 }
@@ -58,14 +64,14 @@ void Render::initializeWindow() {
 
     // Initialize score text
     score.setFont(font);
-    score.setCharacterSize(24);
+    score.setCharacterSize(20);
     score.setFillColor(sf::Color::White);
-    score.setString("Score : ");
+    score.setString("Press Enter to start");
     score.setPosition(sf::Vector2f(5, 5));
 }
 
 void Render::draw() {
-    if (snakeUpdate.getElapsedTime() >= snakeSpeed) {
+    if (started && snakeUpdate.getElapsedTime() >= snakeSpeed) {
         // Move the snake
         if (vision) {
             snake.look(grid);
@@ -99,6 +105,10 @@ void Render::handleEvents(sf::Event event) {
 
     case sf::Event::KeyPressed:
         snake.handleEvent(event.key.code);
+        if (event.key.code == sf::Keyboard::Enter) {
+            started = true;
+        }
+        break;
 
     default:
         break;

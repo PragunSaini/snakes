@@ -4,14 +4,20 @@
 
 int main() {
     // Train a snake
-    GeneticAlgo gen;
-    gen.start(true, true);
+    // GeneticAlgo gen;
+    // gen.start(true, false);
+
+    // Manual playing
+    // Render manual(false);
+    // manual.start();
 
     // Replay best snake
-    Render render;
-    render.loadFromFile(0);
-    render.start();
+    // Render trained;
+    // trained.loadFromFile(0);
+    // trained.start();
 
-    // Tournament tourney(render.snake.net.weights, render.snake.net.biases);
-    // tourney.start();
+    // Play a tournament
+    Tournament t;
+    t.loadFromFile();
+    t.start();
 }

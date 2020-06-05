@@ -18,10 +18,10 @@ std::vector<std::pair<int, int>> Snake::visionDirs = {
     {-1, -1} // UP-LEFT
 };
 
-Snake::Snake(int color) :
+Snake::Snake() :
     changedir(Direction::SAME),
     stepsSinceFood(Config::ROWS * Config::COLS),
-    color(color),
+    color(Seeder::getSeed() % 4 + 1),
     alive(true),
     score(0),
     steps(0),

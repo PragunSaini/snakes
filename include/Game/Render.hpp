@@ -20,6 +20,7 @@ private:
     sf::Font font;           // font for window text
     sf::Text score;          // used to display score
     sf::Clock fps;           // to display FPS
+    bool started;            // flag for starting snake
 
     void initializeWindow();      // used to setup window
     void draw();                  // Draw the screen

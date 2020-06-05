@@ -2,14 +2,16 @@
 #include "Config.hpp"
 
 std::unordered_map<int, sf::Color> Map::colMap =
-    std::unordered_map<int, sf::Color>({{0, sf::Color::Black},
+    std::unordered_map<int, sf::Color>({{0, sf::Color::Black}, // empty tile
                                         {1, sf::Color(255, 20, 147)},
                                         {11, sf::Color(155, 20, 47, 100)},
                                         {2, sf::Color(0, 255, 255, 255)},
                                         {12, sf::Color(0, 100, 100, 50)},
                                         {3, sf::Color(0, 255, 0)},
                                         {13, sf::Color(0, 155, 0, 70)},
-                                        {-1, sf::Color::Red}});
+                                        {4, sf::Color(240, 220, 110)},
+                                        {14, sf::Color(20, 25, 0)},
+                                        {-1, sf::Color::Red}}); // food tile
 
 Map::Map() {
     int width = Config::COLS;

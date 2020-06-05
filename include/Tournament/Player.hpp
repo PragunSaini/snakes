@@ -9,6 +9,7 @@
 class Player : public Snake {
 private:
     bool isValidPosition(int, int, Direction, Game *);
+    void calculateFitness();
 
 public:
     void initBody(Game *);

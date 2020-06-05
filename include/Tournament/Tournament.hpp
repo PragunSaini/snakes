@@ -11,7 +11,7 @@
  * To hold tournament between multiple snakes
  */
 class Tournament : public Game {
-private:
+public:
     int playerCount;             // number of players
     std::vector<Player> players; // players in the tournament
     sf::RenderWindow window;     // window to render
@@ -22,6 +22,7 @@ private:
     sf::Font font;               // font for window text
     sf::Text bestScore;          // used to display best score
     sf::Clock fps;               // to display FPS
+    bool started;                // whether to start the tournament
 
     void initializeWindow(); // used to setup window
     void draw();             // Draw the screen
@@ -30,6 +31,7 @@ public:
     Tournament(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
     void initObjects();
     void start();
+    void loadFromFile();
 };
 
 #endif

@@ -6,14 +6,14 @@
 
 namespace Config {
     // Screen Params
-    const int WIDTH = 600;  //1280
-    const int HEIGHT = 600; //720
+    const int WIDTH = 1000;
+    const int HEIGHT = 1000;
 
     const int FRAMERATE = 0; // set <= 0 for VSync
-    const double SNAKESPEED = 100;
+    const double SNAKESPEED = 60;
 
-    const int ROWS = 10; // 90
-    const int COLS = 10; // 160
+    const int ROWS = 100; // 90
+    const int COLS = 100; // 160
 
     // NN layers
     const std::vector<int> LAYERS = {32, 20, 12, 4};
@@ -33,7 +33,10 @@ namespace Config {
     const int FOODCNT = 1;
 
     // Food Count (for tournament snake training)
-    const int FOODCNT_T = 200;
+    const int FOODCNT_T = 100;
+
+    // Number of snakes in tournament
+    const int PLAYERCNT = 100;
 
 } // namespace Config
 

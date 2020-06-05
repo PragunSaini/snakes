@@ -50,12 +50,13 @@ class Snake {
     // Utility functions
     Eigen::VectorXd getVision(std::vector<std::vector<int>> &); // get snake's vision vector
     bool inRange(int, int);                                     // checks coordinates in grid
-    void calculateFitness();                                    // calculate fitness of snake's game
     void die(std::vector<std::vector<int>> &);                  // snake ga shinda
 
 protected:
     int length; // Snake's length
     int color;  // color of the snake
+
+    virtual void calculateFitness(); // calculate fitness of snake's game
 
 public:
     std::deque<Snakebody> snake; // Snake's body
@@ -65,7 +66,7 @@ public:
     int steps;                   // Number of steps moved
     double fitness;              // Fitness of snake (calculated after death)
 
-    Snake(int = 1); // (optional = color)
+    Snake();
     void initNeuralNet(const std::vector<Eigen::MatrixXd> &w = {}, const std::vector<Eigen::VectorXd> &b = {});
     void initBody(Game *);
     void look(std::vector<std::vector<int>> &);                  // snake looks and get NN's response

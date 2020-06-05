@@ -48,3 +48,14 @@ void Player::initBody(Game *game) {
         game->grid[snake.back().y][snake.back().x] = color;
     }
 }
+
+// (WIP)
+void Player::calculateFitness() {
+    fitness = steps +
+              (std::pow(2.0, (double)score) + std::pow((double)score, 2.1) * 500) -
+              (std::pow(0.1 * steps, 1.3) * std::pow((double)score, 1.1));
+    fitness = std::max(fitness, .1);
+    // fitness = 0.25 * steps + std::pow((double)score, 3);
+    // fitness = score * 2.0;
+    // fitness = std::pow(2.0, (double)score) + std::pow((double)score, 2.1) - std::pow(steps * 0.25, 1.5);
+}

@@ -17,7 +17,7 @@ namespace GeneticUtils {
 }; // namespace GeneticUtils
 
 class GeneticAlgo {
-private:
+protected:
     static int generations;
     static int popSize;
     static int offspringsSize;

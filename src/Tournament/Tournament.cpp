@@ -3,9 +3,10 @@
 
 Tournament::Tournament(const std::vector<Eigen::MatrixXd> &w, const std::vector<Eigen::VectorXd> &b) :
     Game(w, b),
-    playerCount(5),
-    players(playerCount) {
-    foodCount = 200;
+    playerCount(Config::PLAYERCNT),
+    players(playerCount),
+    started(false) {
+    foodCount = Config::FOODCNT_T;
     for (Player &player : players) {
         player.initNeuralNet(w, b);
     }
@@ -39,14 +40,14 @@ void Tournament::initializeWindow() {
 
     // Initialize score text
     bestScore.setFont(font);
-    bestScore.setCharacterSize(24);
+    bestScore.setCharacterSize(20);
     bestScore.setFillColor(sf::Color::White);
-    bestScore.setString("Best Score : ");
+    bestScore.setString("Press Enter to start");
     bestScore.setPosition(sf::Vector2f(5, 5));
 }
 
 void Tournament::draw() {
-    if (snakeUpdate.getElapsedTime() >= snakeSpeed) {
+    if (started && snakeUpdate.getElapsedTime() >= snakeSpeed) {
         for (Player &player : players) {
             if (player.alive) {
                 player.look(grid);
@@ -89,7 +90,20 @@ void Tournament::start() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Enter) {
+                    started = true;
+                }
+            }
         }
         draw();
+    }
+}
+
+void Tournament::loadFromFile() {
+    int i = 0;
+    for (Player &player : players) {
+        player.net.loadFromFile(0); // just loading from single file for all snakes
+        i++;
     }
 }
